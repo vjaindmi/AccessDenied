@@ -28,13 +28,13 @@ dependencies {
     compile 'com.facebook.stetho:stetho:1.5.0'
     compile 'com.crop.multiple:multipleImagePickerLib:1.4.4'
     compile 'com.google.code.gson:gson:2.8.1'
+    compile "com.android.support:exifinterface:25.3.1"
     compile "com.andkulikov:transitionseverywhere:1.7.8"
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.9.1'
     compile 'io.realm:android-adapters:2.0.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.affectiva.android:affdexsdk:3.+'
     compile 'com.affectiva.android:affdexsdk:3.2'
     compile 'com.android.support:support-v4:26.0.0'
     compile 'com.android.support:design:26.1.0'

@@ -5,8 +5,6 @@
 
 package com.app.rekog.recognize;
 
-import com.google.gson.Gson;
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -46,22 +44,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-
-import org.json.JSONException;
-
 import com.affectiva.android.affdex.sdk.Frame;
 import com.affectiva.android.affdex.sdk.Frame.ROTATE;
 import com.affectiva.android.affdex.sdk.detector.CameraDetector;
@@ -73,10 +55,22 @@ import com.app.rekog.beans.ResultBean;
 import com.app.rekog.beans.users.TimeStamp;
 import com.app.rekog.beans.users.User;
 import com.app.rekog.database.RealmDatabaseController;
+import com.google.gson.Gson;
 import com.kairos.Kairos;
 import com.kairos.KairosListener;
-
 import io.realm.RealmList;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+import org.json.JSONException;
 
 /*
  * AffdexMe is an app that demonstrates the use of the Affectiva Android SDK.  It uses the
@@ -1205,6 +1199,10 @@ public class RecognizeActivity extends AppCompatActivity
 
     private void getImage(Bitmap bitmap) {
         String galleryId = getString(R.string.gallery_name);
+        TextView username = findViewById(R.id.user_name);
+        TextView message = findViewById(R.id.message);
+        username.setText("");
+        message.setText("");
         try {
             kairos.recognize(bitmap, galleryId, null, null, null, null, this);
         } catch (JSONException e) {
@@ -1264,7 +1262,7 @@ public class RecognizeActivity extends AppCompatActivity
                         leftImage.setImageDrawable(getResources().getDrawable(R.drawable.sad_2));
                         rightImage.setImageDrawable(getResources().getDrawable(R.drawable.sad_2));
                         message.setText(
-                                RealmDatabaseController.getInstance().getSadEmotion(ran.nextInt(5))
+                                RealmDatabaseController.getInstance().getSadEmotion(ran.nextInt(4))
                                         .getSadGreeting());
                         break;
                     case "anger":
@@ -1272,28 +1270,28 @@ public class RecognizeActivity extends AppCompatActivity
                         rightImage.setImageDrawable(getResources().getDrawable(R.drawable.anger_2));
                         message.setText(
                                 RealmDatabaseController.getInstance()
-                                        .getAngerEmotion(ran.nextInt(5))
+                                        .getAngerEmotion(ran.nextInt(4))
                                         .getAngerGreeting());
                         break;
                     case "joy":
                         leftImage.setImageDrawable(getResources().getDrawable(R.drawable.happy_1));
                         rightImage.setImageDrawable(getResources().getDrawable(R.drawable.happy_2));
                         message.setText(
-                                RealmDatabaseController.getInstance().getJoyEmotion(ran.nextInt(5))
+                                RealmDatabaseController.getInstance().getJoyEmotion(ran.nextInt(4))
                                         .getJoyGreeting());
                         break;
                     case "fear":
                         leftImage.setImageDrawable(getResources().getDrawable(R.drawable.fear_1));
                         rightImage.setImageDrawable(getResources().getDrawable(R.drawable.fear_2));
                         message.setText(
-                                RealmDatabaseController.getInstance().getFearEmotion(ran.nextInt(5))
+                                RealmDatabaseController.getInstance().getFearEmotion(ran.nextInt(4))
                                         .getFearGreeting());
                         break;
                     case "surprise":
                         leftImage.setImageDrawable(getResources().getDrawable(R.drawable.surprise_1));
                         rightImage.setImageDrawable(getResources().getDrawable(R.drawable.surprise_2));
                         message.setText(
-                                RealmDatabaseController.getInstance().getSurpriseEmotion(ran.nextInt(5))
+                                RealmDatabaseController.getInstance().getSurpriseEmotion(ran.nextInt(4))
                                         .getSurpriseGreeting());
                         break;
                 }

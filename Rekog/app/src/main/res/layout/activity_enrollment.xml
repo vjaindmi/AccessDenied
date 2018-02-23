@@ -35,7 +35,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/user_name"
-                android:text="Rahul"
                 android:textSize="15sp" />
         </android.support.design.widget.TextInputLayout>
 
@@ -49,7 +48,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="rahul@gmail.com"
                 android:hint="@string/email"
                 android:inputType="textEmailAddress"
                 android:padding="10dp"

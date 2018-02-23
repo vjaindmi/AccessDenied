@@ -1,15 +1,7 @@
 package com.app.rekog.base;
 
 import android.app.Application;
-import android.content.Context;
-import android.content.SharedPreferences;
-
 import com.app.rekog.R;
-import com.app.rekog.beans.emotions.AngerEmotion;
-import com.app.rekog.beans.emotions.DisgustEmotion;
-import com.app.rekog.beans.emotions.FearEmotion;
-import com.app.rekog.beans.emotions.JoyEmotion;
-import com.app.rekog.beans.emotions.SadEmotion;
 import com.app.rekog.database.RealmDatabaseController;
 import com.app.rekog.sqlitedb.DatabaseHelper;
 import com.facebook.stetho.Stetho;
@@ -41,8 +33,8 @@ public class AppController extends Application {
     /*initialized sdk*/
     private void initializeSdk() {
         Define.MEDIA_PROVIDER = getString(R.string.image_provider);
-        String app_id = "c7d15241";
-        String api_key = "fd3287889f836397be1857dd4d0adb11";
+        String app_id = getString(R.string.kairos_app_id);
+        String api_key = getString(R.string.kairos_api_key);
         kairos.setAuthentication(this, app_id, api_key);
     }
 

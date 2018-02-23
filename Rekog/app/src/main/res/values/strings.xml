@@ -60,4 +60,13 @@
     <string name="please_look_directly_into_the_camera">Please look directly into the camera</string>
     <string name="time">Time</string>
     <string name="attendance_record">Attendance Record</string>
+
+
+    <!--Rahul Kairos-->
+    <string name="kairos_app_id">b9fae3a2</string>
+    <string name="kairos_api_key">c630bc8f2f44b5e8bd405fc3ffb03c36</string>
+
+    <!--Bhavya Kairos-->
+    <!--<string name="kairos_app_id">c7d15241</string>-->
+    <!--<string name="kairos_api_key">fd3287889f836397be1857dd4d0adb11</string>-->
 </resources>

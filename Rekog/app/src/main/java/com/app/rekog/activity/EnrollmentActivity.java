@@ -100,8 +100,8 @@ public class EnrollmentActivity extends Activity implements View.OnClickListener
     /*initialized sdk*/
     private void initializeSdk() {
         Define.MEDIA_PROVIDER = getString(R.string.image_provider);
-        String app_id = "c7d15241";
-        String api_key = "fd3287889f836397be1857dd4d0adb11";
+        String app_id = getString(R.string.kairos_app_id);
+        String api_key = getString(R.string.kairos_api_key);
         kairos.setAuthentication(this, app_id, api_key);
     }
 

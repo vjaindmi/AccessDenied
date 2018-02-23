@@ -116,50 +116,90 @@ public class RecognizeActivity extends AppCompatActivity
         KairosListener {
 
     public static final int MAX_SUPPORTED_FACES = 3;
+
     public static final boolean STORE_RAW_SCREENSHOTS = false;
+
     // setting to enable saving the raw images when taking screenshots
     public static final int NUM_METRICS_DISPLAYED = 6;
+
     private static final String LOG_TAG = "AffdexMe";
+
     private static final int CAMERA_PERMISSIONS_REQUEST = 42;
+
     //value is arbitrary (between 0 and 255)
     private static final int EXTERNAL_STORAGE_PERMISSIONS_REQUEST = 73;
+
     int cameraPreviewWidth = 0;
+
     int cameraPreviewHeight = 0;
+
     CameraDetector.CameraType cameraType;
+
     boolean mirrorPoints = false;
+
     private boolean cameraPermissionsAvailable = false;
+
     private boolean storagePermissionsAvailable = false;
+
     private CameraDetector detector = null;
+
     private RelativeLayout metricViewLayout;
+
     private LinearLayout leftMetricsLayout;
+
     private LinearLayout rightMetricsLayout;
+
     private MetricDisplay[] metricDisplays;
+
     private TextView[] metricNames;
+
     private TextView fpsName;
+
     private TextView fpsPct;
+
     private TextView pleaseWaitTextView;
+
     private ProgressBar progressBar;
+
     private RelativeLayout mainLayout; //layout, to be resized, containing all UI elements
+
     private RelativeLayout progressBarLayout;
+
     //layout used to show progress circle while camera is starting
     private LinearLayout permissionsUnavailableLayout;
+
     //layout used to notify the user that not enough permissions have been granted to use the app
     private SurfaceView cameraView; //SurfaceView used to display camera images
+
     private DrawingView drawingView;
+
     //SurfaceView containing its own thread, used to draw facial tracking dots
     private ImageButton settingsButton;
+
     private ImageButton cameraButton;
+
     private ImageButton screenshotButton;
+
     private Frame mostRecentFrame;
+
     private boolean isMenuVisible = false;
+
     private boolean isFPSVisible = false;
+
     private boolean isMenuShowingForFirstTime = true;
+
     private long firstSystemTime = 0;
+
     private float numberOfFrames = 0;
+
     private long timeToUpdate = 0;
+
     private boolean isFrontFacingCameraDetected = true;
+
     private boolean isBackFacingCameraDetected = true;
+
     private boolean multiFaceModeEnabled = false;
+
     private Kairos kairos = new Kairos();
 
     @Override
@@ -1309,8 +1349,8 @@ public class RecognizeActivity extends AppCompatActivity
     }
 
     private void initializeSdk() {
-        String app_id = "c7d15241";
-        String api_key = "fd3287889f836397be1857dd4d0adb11";
+        String app_id = getString(R.string.kairos_app_id);
+        String api_key = getString(R.string.kairos_api_key);
         kairos.setAuthentication(this, app_id, api_key);
     }
 

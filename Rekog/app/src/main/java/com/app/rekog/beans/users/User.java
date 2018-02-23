@@ -10,11 +10,11 @@ import io.realm.annotations.PrimaryKey;
 
 public class User extends RealmObject{
 
-    @PrimaryKey
     long id;
 
     String name;
 
+    @PrimaryKey
     String email;
 
     RealmList<TimeStamp> time;

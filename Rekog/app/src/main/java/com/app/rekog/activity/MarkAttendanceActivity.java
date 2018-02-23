@@ -113,16 +113,14 @@ public final class MarkAttendanceActivity extends AppCompatActivity implements K
                     RealmList<TimeStamp> al = new RealmList<>();
                     if (user1 != null) {
                         if (user1.getTime() != null) {
-//                            al.add(user1.getTime());
+                            al.addAll(user1.getTime());
                         }
-                    }
-                    else{
-
                     }
                     TimeStamp timeStamp = new TimeStamp();
                     timeStamp.setTime(System.currentTimeMillis() + "");
                     al.add(timeStamp);
                     user.setTime(al);
+                    RealmDatabaseController.getInstance().insertUser(user);
 
                 }
             }

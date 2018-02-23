@@ -39,6 +39,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -53,8 +54,8 @@ import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
-import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 
 import com.affectiva.android.affdex.sdk.Frame;
@@ -63,8 +64,8 @@ import com.affectiva.android.affdex.sdk.detector.CameraDetector;
 import com.affectiva.android.affdex.sdk.detector.Detector;
 import com.affectiva.android.affdex.sdk.detector.Face;
 import com.app.rekog.R;
-import com.app.rekog.base.AppController;
 import com.app.rekog.beans.ResultBean;
+import com.app.rekog.database.RealmDatabaseController;
 import com.kairos.Kairos;
 import com.kairos.KairosListener;
 
@@ -99,15 +100,19 @@ import com.kairos.KairosListener;
  */
 
 public class RecognizeActivity extends AppCompatActivity
-        implements Detector.FaceListener, Detector.ImageListener, CameraDetector.CameraEventListener,
-        View.OnTouchListener, ActivityCompat.OnRequestPermissionsResultCallback, DrawingView.DrawingThreadEventListener,
+        implements Detector.FaceListener, Detector.ImageListener,
+        CameraDetector.CameraEventListener,
+        View.OnTouchListener, ActivityCompat.OnRequestPermissionsResultCallback,
+        DrawingView.DrawingThreadEventListener,
         KairosListener {
 
     public static final int MAX_SUPPORTED_FACES = 3;
-    public static final boolean STORE_RAW_SCREENSHOTS = false; // setting to enable saving the raw images when taking screenshots
+    public static final boolean STORE_RAW_SCREENSHOTS = false;
+    // setting to enable saving the raw images when taking screenshots
     public static final int NUM_METRICS_DISPLAYED = 6;
     private static final String LOG_TAG = "AffdexMe";
-    private static final int CAMERA_PERMISSIONS_REQUEST = 42;  //value is arbitrary (between 0 and 255)
+    private static final int CAMERA_PERMISSIONS_REQUEST = 42;
+    //value is arbitrary (between 0 and 255)
     private static final int EXTERNAL_STORAGE_PERMISSIONS_REQUEST = 73;
     int cameraPreviewWidth = 0;
     int cameraPreviewHeight = 0;
@@ -126,10 +131,13 @@ public class RecognizeActivity extends AppCompatActivity
     private TextView pleaseWaitTextView;
     private ProgressBar progressBar;
     private RelativeLayout mainLayout; //layout, to be resized, containing all UI elements
-    private RelativeLayout progressBarLayout; //layout used to show progress circle while camera is starting
-    private LinearLayout permissionsUnavailableLayout; //layout used to notify the user that not enough permissions have been granted to use the app
+    private RelativeLayout progressBarLayout;
+    //layout used to show progress circle while camera is starting
+    private LinearLayout permissionsUnavailableLayout;
+    //layout used to notify the user that not enough permissions have been granted to use the app
     private SurfaceView cameraView; //SurfaceView used to display camera images
-    private DrawingView drawingView; //SurfaceView containing its own thread, used to draw facial tracking dots
+    private DrawingView drawingView;
+    //SurfaceView containing its own thread, used to draw facial tracking dots
     private ImageButton settingsButton;
     private ImageButton cameraButton;
     private ImageButton screenshotButton;
@@ -148,7 +156,8 @@ public class RecognizeActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN); //To maximize UI space, we declare our app to be full-screen
+        getWindow().addFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN); //To maximize UI space, we declare our app to be full-screen
         initializeSdk();
         preproccessMetricImages();
         setContentView(R.layout.activity_recognize);
@@ -168,17 +177,20 @@ public class RecognizeActivity extends AppCompatActivity
             if (emoji.equals(Face.EMOJI.UNKNOWN)) {
                 continue;
             }
-            String emojiResourceName = emoji.name().trim().replace(' ', '_').toLowerCase(Locale.US).concat("_emoji");
+            String emojiResourceName = emoji.name().trim().replace(' ', '_').toLowerCase(Locale.US)
+                    .concat("_emoji");
             String emojiFileName = emojiResourceName + ".png";
             ImageHelper.preproccessImageIfNecessary(context, emojiFileName, emojiResourceName);
         }
 
         ImageHelper.preproccessImageIfNecessary(context, "female_glasses.png", "female_glasses");
-        ImageHelper.preproccessImageIfNecessary(context, "female_noglasses.png", "female_noglasses");
+        ImageHelper
+                .preproccessImageIfNecessary(context, "female_noglasses.png", "female_noglasses");
         ImageHelper.preproccessImageIfNecessary(context, "male_glasses.png", "male_glasses");
         ImageHelper.preproccessImageIfNecessary(context, "male_noglasses.png", "male_noglasses");
         ImageHelper.preproccessImageIfNecessary(context, "unknown_glasses.png", "unknown_glasses");
-        ImageHelper.preproccessImageIfNecessary(context, "unknown_noglasses.png", "unknown_noglasses");
+        ImageHelper
+                .preproccessImageIfNecessary(context, "unknown_noglasses.png", "unknown_noglasses");
     }
 
     private void checkForCameraPermissions() {
@@ -190,7 +202,8 @@ public class RecognizeActivity extends AppCompatActivity
         if (!cameraPermissionsAvailable) {
 
             // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+            if (ActivityCompat
+                    .shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
 
                 // Show an explanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
@@ -207,12 +220,14 @@ public class RecognizeActivity extends AppCompatActivity
         storagePermissionsAvailable =
                 ContextCompat.checkSelfPermission(
                         getApplicationContext(),
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED;
 
         if (!storagePermissionsAvailable) {
 
             // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 
                 // Show an explanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
@@ -252,7 +267,8 @@ public class RecognizeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == CAMERA_PERMISSIONS_REQUEST) {
@@ -278,7 +294,8 @@ public class RecognizeActivity extends AppCompatActivity
                 int grantResult = grantResults[i];
 
                 if (permission.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    storagePermissionsAvailable = (grantResult == PackageManager.PERMISSION_GRANTED);
+                    storagePermissionsAvailable = (grantResult
+                            == PackageManager.PERMISSION_GRANTED);
                 }
             }
 
@@ -287,7 +304,6 @@ public class RecognizeActivity extends AppCompatActivity
                 takeScreenshot(screenshotButton);
             }
         }
-
     }
 
     private void showPermissionExplanationDialog(int requestCode) {
@@ -300,24 +316,28 @@ public class RecognizeActivity extends AppCompatActivity
         // set dialog message
         if (requestCode == CAMERA_PERMISSIONS_REQUEST) {
             alertDialogBuilder
-                    .setMessage(getResources().getString(R.string.permissions_camera_needed_explanation))
+                    .setMessage(getResources()
+                            .getString(R.string.permissions_camera_needed_explanation))
                     .setCancelable(false)
-                    .setPositiveButton(getResources().getString(R.string.understood), new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                            requestCameraPermissions();
-                        }
-                    });
+                    .setPositiveButton(getResources().getString(R.string.understood),
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                    requestCameraPermissions();
+                                }
+                            });
         } else if (requestCode == EXTERNAL_STORAGE_PERMISSIONS_REQUEST) {
             alertDialogBuilder
-                    .setMessage(getResources().getString(R.string.permissions_storage_needed_explanation))
+                    .setMessage(getResources()
+                            .getString(R.string.permissions_storage_needed_explanation))
                     .setCancelable(false)
-                    .setPositiveButton(getResources().getString(R.string.understood), new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialog.cancel();
-                            requestStoragePermissions();
-                        }
-                    });
+                    .setPositiveButton(getResources().getString(R.string.understood),
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                    requestStoragePermissions();
+                                }
+                            });
         }
 
         // create alert dialog
@@ -348,7 +368,8 @@ public class RecognizeActivity extends AppCompatActivity
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         //restore the camera type settings
-        String cameraTypeName = sharedPreferences.getString("cameraType", CameraDetector.CameraType.CAMERA_FRONT.name());
+        String cameraTypeName = sharedPreferences
+                .getString("cameraType", CameraDetector.CameraType.CAMERA_FRONT.name());
         if (cameraTypeName.equals(CameraDetector.CameraType.CAMERA_FRONT.name())) {
             cameraType = CameraDetector.CameraType.CAMERA_FRONT;
             mirrorPoints = true;
@@ -363,7 +384,8 @@ public class RecognizeActivity extends AppCompatActivity
         //Get handles to UI objects
         ViewGroup activityLayout = (ViewGroup) findViewById(android.R.id.content);
         progressBarLayout = (RelativeLayout) findViewById(R.id.progress_bar_cover);
-        permissionsUnavailableLayout = (LinearLayout) findViewById(R.id.permissionsUnavialableLayout);
+        permissionsUnavailableLayout = (LinearLayout) findViewById(
+                R.id.permissionsUnavialableLayout);
         metricViewLayout = (RelativeLayout) findViewById(R.id.metric_view_group);
         leftMetricsLayout = (LinearLayout) findViewById(R.id.left_metrics);
         rightMetricsLayout = (LinearLayout) findViewById(R.id.right_metrics);
@@ -434,15 +456,15 @@ public class RecognizeActivity extends AppCompatActivity
          * when the navigation bar has been made visible again, which corresponds to the touch event that Android
          * steals. If the menu bar was not visible, we make it visible.
          */
-        activityLayout.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-            @Override
-            public void onSystemUiVisibilityChange(int uiCode) {
-                if ((uiCode == 0) && (!isMenuVisible)) {
-                    setMenuVisible(true);
-                }
-
-            }
-        });
+        activityLayout.setOnSystemUiVisibilityChangeListener(
+                new View.OnSystemUiVisibilityChangeListener() {
+                    @Override
+                    public void onSystemUiVisibilityChange(int uiCode) {
+                        if ((uiCode == 0) && (!isMenuVisible)) {
+                            setMenuVisible(true);
+                        }
+                    }
+                });
 
         retryPermissionsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -457,7 +479,9 @@ public class RecognizeActivity extends AppCompatActivity
          * the camera. If a SurfaceView is passed in as the last argument to the constructor,
          * that view will be painted with what the camera sees.
          */
-        detector = new CameraDetector(this, cameraType, cameraView, (multiFaceModeEnabled ? MAX_SUPPORTED_FACES : 1), Detector.FaceDetectorMode.LARGE_FACES);
+        detector = new CameraDetector(this, cameraType, cameraView,
+                (multiFaceModeEnabled ? MAX_SUPPORTED_FACES : 1),
+                Detector.FaceDetectorMode.LARGE_FACES);
         detector.setImageListener(this);
         detector.setFaceListener(this);
         detector.setOnCameraEventListener(this);
@@ -493,7 +517,8 @@ public class RecognizeActivity extends AppCompatActivity
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         //restore the camera type settings
-        String cameraTypeName = sharedPreferences.getString("cameraType", CameraDetector.CameraType.CAMERA_FRONT.name());
+        String cameraTypeName = sharedPreferences
+                .getString("cameraType", CameraDetector.CameraType.CAMERA_FRONT.name());
         if (cameraTypeName.equals(CameraDetector.CameraType.CAMERA_FRONT.name())) {
             setCameraType(CameraDetector.CameraType.CAMERA_FRONT);
         } else {
@@ -518,13 +543,15 @@ public class RecognizeActivity extends AppCompatActivity
             setFPSVisible(false);
         }
 
-        if (sharedPreferences.getBoolean("track", drawingView.getDrawPointsEnabled())) {  //restore isTrackingDotsVisible
+        if (sharedPreferences.getBoolean("track",
+                drawingView.getDrawPointsEnabled())) {  //restore isTrackingDotsVisible
             setTrackPoints(true);
         } else {
             setTrackPoints(false);
         }
 
-        if (sharedPreferences.getBoolean("appearance", drawingView.getDrawAppearanceMarkersEnabled())) {
+        if (sharedPreferences
+                .getBoolean("appearance", drawingView.getDrawAppearanceMarkersEnabled())) {
             detector.setDetectAllAppearances(true);
             setShowAppearance(true);
         } else {
@@ -552,10 +579,13 @@ public class RecognizeActivity extends AppCompatActivity
     }
 
     /**
-     * Populates a TextView to display a metric name and readies a MetricDisplay to display the value.
+     * Populates a TextView to display a metric name and readies a MetricDisplay to display the
+     * value.
      * Uses reflection to:
-     * -enable the corresponding metric in the Detector object by calling Detector.setDetect<MetricName>()
-     * -save the Method object that will be invoked on the Face object received in onImageResults() to get the metric score
+     * -enable the corresponding metric in the Detector object by calling
+     * Detector.setDetect<MetricName>()
+     * -save the Method object that will be invoked on the Face object received in onImageResults()
+     * to get the metric score
      */
     void activateMetric(int index, MetricsManager.Metrics metric) {
 
@@ -564,9 +594,11 @@ public class RecognizeActivity extends AppCompatActivity
         try {
             switch (metric.getType()) {
                 case Emotion:
-                    Detector.class.getMethod("setDetect" + MetricsManager.getCamelCase(metric), boolean.class).invoke(detector, true);
+                    Detector.class.getMethod("setDetect" + MetricsManager.getCamelCase(metric),
+                            boolean.class).invoke(detector, true);
                     metricNames[index].setText(MetricsManager.getUpperCaseName(metric));
-                    getFaceScoreMethod = Face.Emotions.class.getMethod("get" + MetricsManager.getCamelCase(metric));
+                    getFaceScoreMethod = Face.Emotions.class
+                            .getMethod("get" + MetricsManager.getCamelCase(metric));
 
                     //The MetricDisplay for Valence is unique; it shades it color depending on the metric value
                     if (metric == MetricsManager.Emotions.VALENCE) {
@@ -576,25 +608,35 @@ public class RecognizeActivity extends AppCompatActivity
                     }
                     break;
                 case Expression:
-                    Detector.class.getMethod("setDetect" + MetricsManager.getCamelCase(metric), boolean.class).invoke(detector, true);
+                    Detector.class.getMethod("setDetect" + MetricsManager.getCamelCase(metric),
+                            boolean.class).invoke(detector, true);
                     metricNames[index].setText(MetricsManager.getUpperCaseName(metric));
-                    getFaceScoreMethod = Face.Expressions.class.getMethod("get" + MetricsManager.getCamelCase(metric));
+                    getFaceScoreMethod = Face.Expressions.class
+                            .getMethod("get" + MetricsManager.getCamelCase(metric));
                     break;
                 case Emoji:
                     detector.setDetectAllEmojis(true);
                     MetricsManager.Emojis emoji = ((MetricsManager.Emojis) metric);
-                    String metricTitle = emoji.getDisplayName(); // + " " + emoji.getUnicodeForEmoji();
+                    String metricTitle = emoji
+                            .getDisplayName(); // + " " + emoji.getUnicodeForEmoji();
                     metricNames[index].setText(metricTitle);
                     Log.d(LOG_TAG, "Getter Method: " + "get" + MetricsManager.getCamelCase(metric));
-                    getFaceScoreMethod = Face.Emojis.class.getMethod("get" + MetricsManager.getCamelCase(metric));
+                    getFaceScoreMethod = Face.Emojis.class
+                            .getMethod("get" + MetricsManager.getCamelCase(metric));
                     break;
             }
         } catch (NoSuchMethodException e) {
-            Log.e(LOG_TAG, String.format("No such method while using reflection to generate methods for %s", metric.toString()), e);
+            Log.e(LOG_TAG, String.format(
+                    "No such method while using reflection to generate methods for %s",
+                    metric.toString()), e);
         } catch (InvocationTargetException e) {
-            Log.e(LOG_TAG, String.format("Invocation error while using reflection to generate methods for %s", metric.toString()), e);
+            Log.e(LOG_TAG, String.format(
+                    "Invocation error while using reflection to generate methods for %s",
+                    metric.toString()), e);
         } catch (IllegalAccessException e) {
-            Log.e(LOG_TAG, String.format("Illegal access error while using reflection to generate methods for %s", metric.toString()), e);
+            Log.e(LOG_TAG, String.format(
+                    "Illegal access error while using reflection to generate methods for %s",
+                    metric.toString()), e);
         }
 
         metricDisplays[index].setMetricToDisplay(metric, getFaceScoreMethod);
@@ -610,7 +652,8 @@ public class RecognizeActivity extends AppCompatActivity
     }
 
     /**
-     * We want to start the camera as late as possible, so it does not freeze the application before it has been visually resumed.
+     * We want to start the camera as late as possible, so it does not freeze the application before
+     * it has been visually resumed.
      * We thus post a runnable that will take care of starting the camera.
      * We also reset variables used to calculate the Processed Frames Per Second.
      */
@@ -651,8 +694,9 @@ public class RecognizeActivity extends AppCompatActivity
     }
 
     void startDetector() {
-        if (!isBackFacingCameraDetected && !isFrontFacingCameraDetected)
+        if (!isBackFacingCameraDetected && !isFrontFacingCameraDetected) {
             return; //without any cameras detected, we cannot proceed
+        }
 
         detector.setDetectValence(true); //this app will always detect valence
         if (!detector.isRunning()) {
@@ -715,10 +759,10 @@ public class RecognizeActivity extends AppCompatActivity
              * to our drawing thread and also inform the thread what the valence score was, as that will determine the color
              * of the bounding box.
              */
-            if (drawingView.getDrawPointsEnabled() || drawingView.getDrawAppearanceMarkersEnabled() || drawingView.getDrawEmojiMarkersEnabled()) {
+            if (drawingView.getDrawPointsEnabled() || drawingView.getDrawAppearanceMarkersEnabled()
+                    || drawingView.getDrawEmojiMarkersEnabled()) {
                 drawingView.updatePoints(faces, mirrorPoints);
             }
-
         } else {
             // metrics overlay is hidden in multi face mode
             metricViewLayout.setVisibility(View.GONE);
@@ -745,7 +789,8 @@ public class RecognizeActivity extends AppCompatActivity
 
     private void processScreenshot(Bitmap drawingViewBitmap, boolean alsoSaveRaw) {
         if (mostRecentFrame == null) {
-            Toast.makeText(getApplicationContext(), "No frame detected, aborting screenshot", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "No frame detected, aborting screenshot",
+                    Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -766,26 +811,32 @@ public class RecognizeActivity extends AppCompatActivity
         metricViewLayout.setDrawingCacheEnabled(false);
 
         Bitmap finalScreenshot = Bitmap
-                .createBitmap(faceBitmap.getWidth(), faceBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                .createBitmap(faceBitmap.getWidth(), faceBitmap.getHeight(),
+                        Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(finalScreenshot);
         Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
 
         canvas.drawBitmap(faceBitmap, 0, 0, paint);
 
-        float scaleFactor = ((float) faceBitmap.getWidth()) / ((float) drawingViewBitmap.getWidth());
+        float scaleFactor = ((float) faceBitmap.getWidth()) / ((float) drawingViewBitmap
+                .getWidth());
         int scaledHeight = Math.round(drawingViewBitmap.getHeight() * scaleFactor);
-        canvas.drawBitmap(drawingViewBitmap, null, new Rect(0, 0, faceBitmap.getWidth(), scaledHeight), paint);
+        canvas.drawBitmap(drawingViewBitmap, null,
+                new Rect(0, 0, faceBitmap.getWidth(), scaledHeight), paint);
 
         scaleFactor = ((float) faceBitmap.getWidth()) / ((float) metricsBitmap.getWidth());
         scaledHeight = Math.round(metricsBitmap.getHeight() * scaleFactor);
-        canvas.drawBitmap(metricsBitmap, null, new Rect(0, 0, faceBitmap.getWidth(), scaledHeight), paint);
+        canvas.drawBitmap(metricsBitmap, null, new Rect(0, 0, faceBitmap.getWidth(), scaledHeight),
+                paint);
 
         metricsBitmap.recycle();
         drawingViewBitmap.recycle();
 
         Date now = new Date();
         String timestamp = DateFormat.format("yyyy-MM-dd_hh-mm-ss", now).toString();
-        File pictureFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "AffdexMe");
+        File pictureFolder = new File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                "AffdexMe");
         if (!pictureFolder.exists()) {
             if (!pictureFolder.mkdir()) {
                 Log.e(LOG_TAG, "Unable to create directory: " + pictureFolder.getAbsolutePath());
@@ -855,7 +906,8 @@ public class RecognizeActivity extends AppCompatActivity
                     throw new Exception("Unknown Metric Type: " + metric.getType().toString());
             }
         } catch (Exception e) {
-            Log.e(LOG_TAG, String.format("Error using reflecting to get %s score from face.", metric.toString()));
+            Log.e(LOG_TAG, String.format("Error using reflecting to get %s score from face.",
+                    metric.toString()));
         }
         metricDisplay.setScore(score);
     }
@@ -863,23 +915,28 @@ public class RecognizeActivity extends AppCompatActivity
     /**
      * FPS measurement simply uses SystemClock to measure how many frames were processed since
      * the FPS variables were last reset.
-     * The constants 1000L and 1000f appear because .elapsedRealtime() measures time in milliseconds.
-     * Note that if 20 frames per second are processed, this method could run for 1.5 years without being reset
+     * The constants 1000L and 1000f appear because .elapsedRealtime() measures time in
+     * milliseconds.
+     * Note that if 20 frames per second are processed, this method could run for 1.5 years without
+     * being reset
      * before numberOfFrames overflows.
      */
     void performFPSCalculations() {
         numberOfFrames += 1;
         long currentTime = SystemClock.elapsedRealtime();
         if (currentTime > timeToUpdate) {
-            float framesPerSecond = (numberOfFrames / (float) (currentTime - firstSystemTime)) * 1000f;
+            float framesPerSecond = (numberOfFrames / (float) (currentTime - firstSystemTime))
+                    * 1000f;
             fpsPct.setText(String.format(" %.1f", framesPerSecond));
             timeToUpdate = currentTime + 1000L;
         }
     }
 
     /**
-     * Although we start the camera in onWindowFocusChanged(), we stop it in onPause(), and set detector to be null so that when onWindowFocusChanged()
-     * is called it restarts the camera. We also set the Progress Bar to be visible, so the camera (which may need resizing when the app
+     * Although we start the camera in onWindowFocusChanged(), we stop it in onPause(), and set
+     * detector to be null so that when onWindowFocusChanged()
+     * is called it restarts the camera. We also set the Progress Bar to be visible, so the camera
+     * (which may need resizing when the app
      * is resumed) is obscured.
      */
     @Override
@@ -906,7 +963,6 @@ public class RecognizeActivity extends AppCompatActivity
         detector.setDetectAllAppearances(false);
         detector.setDetectAllEmojis(false);
     }
-
 
     /**
      * When the user taps the screen, hide the menu if it is visible and show it if it is hidden.
@@ -965,7 +1021,6 @@ public class RecognizeActivity extends AppCompatActivity
         drawingView.setDrawEmojiMarkersEnabled(b);
     }
 
-
     void setFPSVisible(boolean b) {
         isFPSVisible = b;
         if (b) {
@@ -1010,8 +1065,10 @@ public class RecognizeActivity extends AppCompatActivity
                 int layoutWidth = displaymetrics.widthPixels;
                 int layoutHeight = displaymetrics.heightPixels;
 
-                if (cameraPreviewWidth == 0 || cameraPreviewHeight == 0 || layoutWidth == 0 || layoutHeight == 0)
+                if (cameraPreviewWidth == 0 || cameraPreviewHeight == 0 || layoutWidth == 0
+                        || layoutHeight == 0) {
                     return;
+                }
 
                 float layoutAspectRatio = (float) layoutWidth / layoutHeight;
                 float cameraPreviewAspectRatio = (float) cameraPreviewWidth / cameraPreviewHeight;
@@ -1027,7 +1084,8 @@ public class RecognizeActivity extends AppCompatActivity
                     newHeight = layoutHeight;
                 }
 
-                drawingView.updateViewDimensions(newWidth, newHeight, cameraPreviewWidth, cameraPreviewHeight);
+                drawingView.updateViewDimensions(newWidth, newHeight, cameraPreviewWidth,
+                        cameraPreviewHeight);
 
                 ViewGroup.LayoutParams params = mainLayout.getLayoutParams();
                 params.height = newHeight;
@@ -1038,16 +1096,17 @@ public class RecognizeActivity extends AppCompatActivity
                 progressBarLayout.setVisibility(View.GONE);
             }
         });
-
     }
 
     public void camera_button_click(View view) {
         //Toggle the camera setting
-        setCameraType(cameraType == CameraDetector.CameraType.CAMERA_FRONT ? CameraDetector.CameraType.CAMERA_BACK : CameraDetector.CameraType.CAMERA_FRONT);
+        setCameraType(cameraType == CameraDetector.CameraType.CAMERA_FRONT
+                ? CameraDetector.CameraType.CAMERA_BACK : CameraDetector.CameraType.CAMERA_FRONT);
     }
 
     private void setCameraType(CameraDetector.CameraType type) {
-        SharedPreferences.Editor preferencesEditor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        SharedPreferences.Editor preferencesEditor = PreferenceManager
+                .getDefaultSharedPreferences(this).edit();
 
         //If a settings change is necessary
         if (cameraType != type) {
@@ -1057,7 +1116,8 @@ public class RecognizeActivity extends AppCompatActivity
                         cameraType = CameraDetector.CameraType.CAMERA_BACK;
                         mirrorPoints = false;
                     } else {
-                        Toast.makeText(this, "No back-facing camera found", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "No back-facing camera found", Toast.LENGTH_LONG)
+                                .show();
                         return;
                     }
                     break;
@@ -1066,7 +1126,8 @@ public class RecognizeActivity extends AppCompatActivity
                         cameraType = CameraDetector.CameraType.CAMERA_FRONT;
                         mirrorPoints = true;
                     } else {
-                        Toast.makeText(this, "No front-facing camera found", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "No front-facing camera found", Toast.LENGTH_LONG)
+                                .show();
                         return;
                     }
                     break;
@@ -1112,6 +1173,50 @@ public class RecognizeActivity extends AppCompatActivity
         if (resultBean.images.size() != 0) {
             String userName = resultBean.images.get(0).transaction.subject_id;
             Toast.makeText(this, userName + " recognised successfully", Toast.LENGTH_SHORT).show();
+
+            RelativeLayout relativeLayout = findViewById(R.id.bottom_view);
+            relativeLayout.setVisibility(View.VISIBLE);
+            ImageView leftImage = findViewById(R.id.left_image);
+            ImageView rightImage = findViewById(R.id.right_image);
+            TextView username = findViewById(R.id.user_name);
+            TextView message = findViewById(R.id.message);
+            username.setText(userName);
+            String emotionFactor = "";
+            Random ran = new Random();
+            message.setText("");
+
+            // generating integer
+
+            switch (emotionFactor) {
+                case "sad":
+                    leftImage.setImageDrawable(getResources().getDrawable(R.drawable.sad_2));
+                    rightImage.setImageDrawable(getResources().getDrawable(R.drawable.sad_2));
+                    message.setText(
+                            RealmDatabaseController.getInstance().getSadEmotion(ran.nextInt(5))
+                                    .getSadGreeting());
+                    break;
+                case "anger":
+                    leftImage.setImageDrawable(getResources().getDrawable(R.drawable.anger_1));
+                    rightImage.setImageDrawable(getResources().getDrawable(R.drawable.anger_2));
+                    message.setText(
+                            RealmDatabaseController.getInstance().getAngerEmotion(ran.nextInt(5))
+                                    .getAngerGreeting());
+                    break;
+                case "joy":
+                    leftImage.setImageDrawable(getResources().getDrawable(R.drawable.happy_1));
+                    rightImage.setImageDrawable(getResources().getDrawable(R.drawable.happy_2));
+                    message.setText(
+                            RealmDatabaseController.getInstance().getJoyEmotion(ran.nextInt(5))
+                                    .getJoyGreeting());
+                    break;
+                case "fear":
+                    leftImage.setImageDrawable(getResources().getDrawable(R.drawable.fear_1));
+                    rightImage.setImageDrawable(getResources().getDrawable(R.drawable.fear_2));
+                    message.setText(
+                            RealmDatabaseController.getInstance().getFearEmotion(ran.nextInt(5))
+                                    .getFearGreeting());
+                    break;
+            }
         } else {
             Toast.makeText(getApplicationContext(), response, Toast.LENGTH_SHORT).show();
         }
@@ -1130,7 +1235,7 @@ public class RecognizeActivity extends AppCompatActivity
     }
 
     @Override
-    public void hideExtraLayouts(){
+    public void hideExtraLayouts() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -1139,6 +1244,4 @@ public class RecognizeActivity extends AppCompatActivity
             }
         });
     }
-
-
 }

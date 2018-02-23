@@ -1,7 +1,15 @@
 package com.app.rekog.base;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import com.app.rekog.R;
+import com.app.rekog.beans.emotions.AngerEmotion;
+import com.app.rekog.beans.emotions.DisgustEmotion;
+import com.app.rekog.beans.emotions.FearEmotion;
+import com.app.rekog.beans.emotions.JoyEmotion;
+import com.app.rekog.beans.emotions.SadEmotion;
 import com.app.rekog.database.RealmDatabaseController;
 import com.app.rekog.sqlitedb.DatabaseHelper;
 import com.facebook.stetho.Stetho;
@@ -40,5 +48,7 @@ public class AppController extends Application {
 
     private void initDatabase(){
         RealmDatabaseController.getInstance().init(this);
+
+
     }
 }

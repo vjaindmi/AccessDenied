@@ -1264,38 +1264,62 @@ public class RecognizeActivity extends AppCompatActivity
                         case "sad":
                             leftImage.setImageDrawable(getResources().getDrawable(R.drawable.sad_2));
                             rightImage.setImageDrawable(getResources().getDrawable(R.drawable.sad_2));
-                            message.setText(
-                                    RealmDatabaseController.getInstance().getSadEmotion(ran.nextInt(4))
-                                            .getSadGreeting());
+                            try {
+                                message.setText(
+                                        RealmDatabaseController.getInstance().getSadEmotion(ran.nextInt(4))
+                                                .getSadGreeting());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                message.setText(
+                                        "A smile is happiness that can be found right under your nose, so dont be sad.");
+                            }
                             break;
                         case "anger":
                             leftImage.setImageDrawable(getResources().getDrawable(R.drawable.anger_1));
                             rightImage.setImageDrawable(getResources().getDrawable(R.drawable.anger_2));
-                            message.setText(
-                                    RealmDatabaseController.getInstance()
-                                            .getAngerEmotion(ran.nextInt(4))
-                                            .getAngerGreeting());
+                            try {
+                                message.setText(
+                                        "You can’t selectively numb your anger, any more than you can"
+                                                + " turn off all lights in a room, and still expect to see the light.");
+                            } catch (Exception e) {
+                                e.printStackTrace();
+
+                            }
                             break;
                         case "joy":
                             leftImage.setImageDrawable(getResources().getDrawable(R.drawable.happy_1));
                             rightImage.setImageDrawable(getResources().getDrawable(R.drawable.happy_2));
-                            message.setText(
-                                    RealmDatabaseController.getInstance().getJoyEmotion(ran.nextInt(4))
-                                            .getJoyGreeting());
+                            try {
+                                message.setText(
+                                        RealmDatabaseController.getInstance().getJoyEmotion(ran.nextInt(4))
+                                                .getJoyGreeting());
+                            } catch (Exception e) {
+                                message.setText(
+                                        "Smiling is good for your health, so keep smiling and keep doctor's away.");
+                            }
                             break;
                         case "fear":
                             leftImage.setImageDrawable(getResources().getDrawable(R.drawable.fear_1));
                             rightImage.setImageDrawable(getResources().getDrawable(R.drawable.fear_2));
-                            message.setText(
-                                    RealmDatabaseController.getInstance().getFearEmotion(ran.nextInt(4))
-                                            .getFearGreeting());
+                            try {
+                                message.setText(
+                                        RealmDatabaseController.getInstance().getFearEmotion(ran.nextInt(4))
+                                                .getFearGreeting());
+                            } catch (Exception e) {
+                                message.setText("Scared is what you're feeling. Brave is what you're doing.");
+                            }
                             break;
                         case "surprise":
                             leftImage.setImageDrawable(getResources().getDrawable(R.drawable.surprise_1));
                             rightImage.setImageDrawable(getResources().getDrawable(R.drawable.surprise_2));
-                            message.setText(
-                                    RealmDatabaseController.getInstance().getSurpriseEmotion(ran.nextInt(4))
-                                            .getSurpriseGreeting());
+                            try {
+                                message.setText(
+                                        RealmDatabaseController.getInstance().getSurpriseEmotion(ran.nextInt(4))
+                                                .getSurpriseGreeting());
+                            } catch (Exception e) {
+                                message.setText(
+                                        "I try not to be surprised. Surprise is the public face of a mind that has been closed.");
+                            }
                             break;
                     }
                 } catch (Exception e) {

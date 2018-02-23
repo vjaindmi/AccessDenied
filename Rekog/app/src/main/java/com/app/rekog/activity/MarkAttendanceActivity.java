@@ -91,42 +91,48 @@ public final class MarkAttendanceActivity extends AppCompatActivity implements K
     @Override
     public void onSuccess(final String s) {
         showProgressDialog(false);
-        if (!TextUtils.isEmpty(s)) {
-            Gson gson = new Gson();
-            ResultBean resultBean = gson.fromJson(s, ResultBean.class);
-            if (resultBean != null) {
-                if (resultBean.images != null && !resultBean.images.isEmpty()) {
-                    ImagesBean imagesBean = resultBean.images.get(0);
-                    String subjectId = imagesBean.transaction.subject_id;
-                    User user = new User();
-                    if (subjectId.contains(Utility.KAIROS_SEPARATOR)) {
-                        String[] split = subjectId.split(Utility.KAIROS_SEPARATOR);
-                        user.setName(split[0]);
-                        Toast.makeText(this, split[0] + " attendance marked", Toast.LENGTH_SHORT).show();
-                        if (split.length > 1) {
-                            user.setEmail(split[1]);
+        try {
+            if (!TextUtils.isEmpty(s)) {
+                Gson gson = new Gson();
+                ResultBean resultBean = gson.fromJson(s, ResultBean.class);
+                if (resultBean != null) {
+                    if (resultBean.images != null && !resultBean.images.isEmpty()) {
+                        ImagesBean imagesBean = resultBean.images.get(0);
+                        String subjectId = imagesBean.transaction.subject_id;
+                        User user = new User();
+                        if (subjectId.contains(Utility.KAIROS_SEPARATOR)) {
+                            String[] split = subjectId.split(Utility.KAIROS_SEPARATOR);
+                            user.setName(split[0]);
+                            Toast.makeText(this, split[0] + " attendance marked", Toast.LENGTH_SHORT).show();
+                            if (split.length > 1) {
+                                user.setEmail(split[1]);
+                            }
+                        } else {
+                            Toast.makeText(this, subjectId + " attendance marked", Toast.LENGTH_SHORT).show();
                         }
-                    } else {
-                        Toast.makeText(this, subjectId + " attendance marked", Toast.LENGTH_SHORT).show();
-                    }
-                    User user1 = RealmDatabaseController.getInstance().getUser(user.getEmail());
-                    RealmList<TimeStamp> al = new RealmList<>();
-                    if (user1 != null) {
-                        if (user1.getTime() != null) {
-                            al.addAll(user1.getTime());
+                        User user1 = RealmDatabaseController.getInstance().getUser(user.getEmail());
+                        RealmList<TimeStamp> al = new RealmList<>();
+                        if (user1 != null) {
+                            if (user1.getTime() != null) {
+                                al.addAll(user1.getTime());
+                            }
                         }
-                    }
-                    TimeStamp timeStamp = new TimeStamp();
-                    timeStamp.setTime(System.currentTimeMillis() + "");
-                    al.add(timeStamp);
-                    user.setTime(al);
-                    RealmDatabaseController.getInstance().insertUser(user);
-                    Log.i("Realm", "user inserted: - "+user.getName());
+                        TimeStamp timeStamp = new TimeStamp();
+                        timeStamp.setTime(System.currentTimeMillis() + "");
+                        al.add(timeStamp);
+                        user.setTime(al);
+                        RealmDatabaseController.getInstance().insertUser(user);
+                        Log.i("Realm", "user inserted: - " + user.getName());
 
+                    }
                 }
             }
+            Log.i("Kairos", s);
         }
-        Log.i("Kairos", s);
+        catch (Exception e){
+            e.printStackTrace();
+            Toast.makeText(this, "User not found!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

@@ -111,7 +111,13 @@ public class MetricDisplay extends View {
         textPaint.setTypeface(face);
     }
 
+    private float currentScore;
+    public float getScrore(){
+        return currentScore;
+    }
+
     public void setScore(float s) {
+        currentScore = s;
         text = String.format("%.0f%%", s);  //change the text of the view
 
         //shading mode is turned on for Valence, which causes this view to shade its color according

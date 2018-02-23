@@ -28,6 +28,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatTextView;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -51,7 +52,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -64,10 +68,15 @@ import com.affectiva.android.affdex.sdk.detector.CameraDetector;
 import com.affectiva.android.affdex.sdk.detector.Detector;
 import com.affectiva.android.affdex.sdk.detector.Face;
 import com.app.rekog.R;
+import com.app.rekog.base.Utility;
 import com.app.rekog.beans.ResultBean;
+import com.app.rekog.beans.users.TimeStamp;
+import com.app.rekog.beans.users.User;
 import com.app.rekog.database.RealmDatabaseController;
 import com.kairos.Kairos;
 import com.kairos.KairosListener;
+
+import io.realm.RealmList;
 
 /*
  * AffdexMe is an app that demonstrates the use of the Affectiva Android SDK.  It uses the
@@ -851,7 +860,7 @@ public class RecognizeActivity extends AppCompatActivity
             ImageHelper.saveBitmapToFileAsPng(finalScreenshot, screenshotFile);
         } catch (IOException e) {
             String msg = "Unable to save screenshot";
-            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
             Log.e(LOG_TAG, msg, e);
             return;
         }
@@ -874,7 +883,7 @@ public class RecognizeActivity extends AppCompatActivity
         finalScreenshot.recycle();
 
         String fileSavedMessage = "Screenshot saved to: " + screenshotFile.getPath();
-        Toast.makeText(getApplicationContext(), fileSavedMessage, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), fileSavedMessage, Toast.LENGTH_SHORT).show();
         Log.d(LOG_TAG, fileSavedMessage);
 
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -1171,55 +1180,118 @@ public class RecognizeActivity extends AppCompatActivity
         Gson gson = new Gson();
         ResultBean resultBean = gson.fromJson(response, ResultBean.class);
         if (resultBean.images.size() != 0) {
-            String userName = resultBean.images.get(0).transaction.subject_id;
-            Toast.makeText(this, userName + " recognised successfully", Toast.LENGTH_SHORT).show();
+            String subjectId = resultBean.images.get(0).transaction.subject_id;
 
-            RelativeLayout relativeLayout = findViewById(R.id.bottom_view);
-            relativeLayout.setVisibility(View.VISIBLE);
-            ImageView leftImage = findViewById(R.id.left_image);
-            ImageView rightImage = findViewById(R.id.right_image);
-            TextView username = findViewById(R.id.user_name);
-            TextView message = findViewById(R.id.message);
-            username.setText(userName);
-            String emotionFactor = "";
-            Random ran = new Random();
-            message.setText("");
+            if(subjectId!=null) {
+                User user = new User();
+                if (subjectId.contains(Utility.KAIROS_SEPARATOR)) {
+                    String[] split = subjectId.split(Utility.KAIROS_SEPARATOR);
+                    user.setName(split[0]);
+                    if (split.length > 1) {
+                        user.setEmail(split[1]);
+                    }
+                } else {
+                }
+                User user1 = RealmDatabaseController.getInstance().getUser(user.getEmail());
+                RealmList<TimeStamp> al = new RealmList<>();
+                if (user1 != null) {
+                    if (user1.getTime() != null) {
+                        al.addAll(user1.getTime());
+                    }
+                }
+                TimeStamp timeStamp = new TimeStamp();
+                timeStamp.setTime(System.currentTimeMillis() + "");
+                al.add(timeStamp);
+                user.setTime(al);
+                RealmDatabaseController.getInstance().insertUser(user);
 
-            // generating integer
+                RelativeLayout relativeLayout = findViewById(R.id.bottom_view);
+                relativeLayout.setVisibility(View.VISIBLE);
+                ImageView leftImage = findViewById(R.id.left_image);
+                ImageView rightImage = findViewById(R.id.right_image);
+                TextView username = findViewById(R.id.user_name);
+                TextView message = findViewById(R.id.message);
+                username.setText(user.getName());
+                String emotionFactor = getCurrentEmotion();
+//            Toast.makeText(getApplicationContext(), emotionFactor, Toast.LENGTH_SHORT).show();
+                Random ran = new Random();
+                message.setText("");
 
-            switch (emotionFactor) {
-                case "sad":
-                    leftImage.setImageDrawable(getResources().getDrawable(R.drawable.sad_2));
-                    rightImage.setImageDrawable(getResources().getDrawable(R.drawable.sad_2));
-                    message.setText(
-                            RealmDatabaseController.getInstance().getSadEmotion(ran.nextInt(5))
-                                    .getSadGreeting());
-                    break;
-                case "anger":
-                    leftImage.setImageDrawable(getResources().getDrawable(R.drawable.anger_1));
-                    rightImage.setImageDrawable(getResources().getDrawable(R.drawable.anger_2));
-                    message.setText(
-                            RealmDatabaseController.getInstance().getAngerEmotion(ran.nextInt(5))
-                                    .getAngerGreeting());
-                    break;
-                case "joy":
-                    leftImage.setImageDrawable(getResources().getDrawable(R.drawable.happy_1));
-                    rightImage.setImageDrawable(getResources().getDrawable(R.drawable.happy_2));
-                    message.setText(
-                            RealmDatabaseController.getInstance().getJoyEmotion(ran.nextInt(5))
-                                    .getJoyGreeting());
-                    break;
-                case "fear":
-                    leftImage.setImageDrawable(getResources().getDrawable(R.drawable.fear_1));
-                    rightImage.setImageDrawable(getResources().getDrawable(R.drawable.fear_2));
-                    message.setText(
-                            RealmDatabaseController.getInstance().getFearEmotion(ran.nextInt(5))
-                                    .getFearGreeting());
-                    break;
+                // generating integer
+
+                switch (emotionFactor) {
+                    case "sad":
+                        leftImage.setImageDrawable(getResources().getDrawable(R.drawable.sad_2));
+                        rightImage.setImageDrawable(getResources().getDrawable(R.drawable.sad_2));
+                        message.setText(
+                                RealmDatabaseController.getInstance().getSadEmotion(ran.nextInt(5))
+                                        .getSadGreeting());
+                        break;
+                    case "anger":
+                        leftImage.setImageDrawable(getResources().getDrawable(R.drawable.anger_1));
+                        rightImage.setImageDrawable(getResources().getDrawable(R.drawable.anger_2));
+                        message.setText(
+                                RealmDatabaseController.getInstance()
+                                        .getAngerEmotion(ran.nextInt(5))
+                                        .getAngerGreeting());
+                        break;
+                    case "joy":
+                        leftImage.setImageDrawable(getResources().getDrawable(R.drawable.happy_1));
+                        rightImage.setImageDrawable(getResources().getDrawable(R.drawable.happy_2));
+                        message.setText(
+                                RealmDatabaseController.getInstance().getJoyEmotion(ran.nextInt(5))
+                                        .getJoyGreeting());
+                        break;
+                    case "fear":
+                        leftImage.setImageDrawable(getResources().getDrawable(R.drawable.fear_1));
+                        rightImage.setImageDrawable(getResources().getDrawable(R.drawable.fear_2));
+                        message.setText(
+                                RealmDatabaseController.getInstance().getFearEmotion(ran.nextInt(5))
+                                        .getFearGreeting());
+                        break;
+                }
+            }else{
+                Toast.makeText(getApplicationContext(), "User Not Found", Toast.LENGTH_SHORT).show();
             }
         } else {
             Toast.makeText(getApplicationContext(), response, Toast.LENGTH_SHORT).show();
         }
+
+
+    }
+
+
+
+    private String getCurrentEmotion(){
+        Log.d("RA","0:"+((AppCompatTextView) metricNames[0]).getText().toString());
+        Log.d("RA","1:"+((AppCompatTextView) metricNames[1]).getText().toString());
+        Log.d("RA","2:"+((AppCompatTextView) metricNames[2]).getText().toString());
+        Log.d("RA","3:"+((AppCompatTextView) metricNames[3]).getText().toString());
+        Log.d("RA","4:"+((AppCompatTextView) metricNames[4]).getText().toString());
+        Log.d("RA","5:"+((AppCompatTextView) metricNames[5]).getText().toString());
+
+        float[] emo = new float[6];
+
+        emo[0]= metricDisplays[0].getScrore();
+        emo[1]= metricDisplays[1].getScrore();
+        emo[2]= metricDisplays[2].getScrore();
+        emo[3]= metricDisplays[3].getScrore();
+        emo[4]= metricDisplays[4].getScrore();
+        emo[5]= metricDisplays[5].getScrore();
+
+        HashMap<Float, String> hm = new HashMap<>();
+        hm.put(emo[0], "anger");
+        hm.put(emo[1], "disgust");
+        hm.put(emo[2], "fear");
+        hm.put(emo[3], "joy");
+        hm.put(emo[4], "sadness");
+        hm.put(emo[5], "surprise");
+
+        Arrays.sort(emo);
+
+
+
+        return hm.get(emo[5]);
     }
 
     @Override

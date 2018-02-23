@@ -33,6 +33,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -175,6 +177,12 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                                     images.add(
                                             Utility.convertToBitmap(bytes));
                                     mPhotoAdapter.notifyDataSetChanged();
+                                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mRecyclerView.scrollToPosition(mPhotoAdapter.getItemCount());
+                                        }
+                                    },300);
                                 }
 
                             }

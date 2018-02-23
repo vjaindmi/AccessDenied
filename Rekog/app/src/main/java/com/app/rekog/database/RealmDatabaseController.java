@@ -44,4 +44,6 @@ public class RealmDatabaseController implements GenericDatabaseInterface {
     public User getUser(int id) {
         return realm.where(User.class).equalTo("id", id).findFirst();
     }
+
+
 }

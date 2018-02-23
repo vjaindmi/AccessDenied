@@ -1,5 +1,7 @@
 package com.app.rekog.activity;
 
+import com.google.gson.Gson;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,24 +16,27 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONException;
+
 import com.app.rekog.R;
 import com.app.rekog.beans.BaseResponse;
 import com.app.rekog.beans.RequestBean;
 import com.app.rekog.beans.ResultBean;
+import com.app.rekog.events.BitmapShareEvent;
 import com.app.rekog.network.ApiClient;
 import com.app.rekog.network.ApiInterface;
-import com.google.gson.Gson;
 import com.kairos.Kairos;
 import com.kairos.KairosListener;
 import com.rahul.media.main.MediaFactory;
 import com.rahul.media.model.Define;
 import com.squareup.picasso.Picasso;
-
-import org.json.JSONException;
-
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -88,7 +93,6 @@ public class EnrollmentActivity extends Activity implements View.OnClickListener
         mImageView4.setOnClickListener(this);
         mImageView5.setOnClickListener(this);
         mImageView6.setOnClickListener(this);
-
     }
 
     @Override
@@ -143,7 +147,6 @@ public class EnrollmentActivity extends Activity implements View.OnClickListener
             public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
                 mProgressBar.setVisibility(View.GONE);
                 BaseResponse emotionResponse = response.body();
-
             }
 
             @Override
@@ -168,7 +171,6 @@ public class EnrollmentActivity extends Activity implements View.OnClickListener
             public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
                 mProgressBar.setVisibility(View.GONE);
                 BaseResponse emotionResponse = response.body();
-
             }
 
             @Override
@@ -178,7 +180,6 @@ public class EnrollmentActivity extends Activity implements View.OnClickListener
             }
         });
     }
-
 
     private boolean validArguments() {
         if (TextUtils.isEmpty(mNameEd.getText().toString())) {
@@ -200,13 +201,11 @@ public class EnrollmentActivity extends Activity implements View.OnClickListener
         }
     }
 
-
     private Bitmap getBitmap(String enrolledImage) {
         File image = new File(enrolledImage);
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         return BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
     }
-
 
     @Override
     public void onSuccess(String response) {
@@ -222,7 +221,8 @@ public class EnrollmentActivity extends Activity implements View.OnClickListener
         if (resultBean.images.size() != 0) {
             String userName = resultBean.images.get(0).transaction.subject_id;
             Toast.makeText(this, userName + " enrolled successfully", Toast.LENGTH_SHORT).show();
-            ArrayList<ResultBean.ImagesBean.CandidatesBean> candidates = resultBean.images.get(0).candidates;
+            ArrayList<ResultBean.ImagesBean.CandidatesBean> candidates = resultBean.images
+                    .get(0).candidates;
             for (int i = 0; i < candidates.size(); i++) {
                 faceIds.add(candidates.get(i).face_id);
             }
@@ -245,11 +245,11 @@ public class EnrollmentActivity extends Activity implements View.OnClickListener
         mediaFactory = MediaFactory.create().start(mediaBuilder);
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        ArrayList<String> pathArrayList = mediaFactory.onActivityResult(requestCode, resultCode, data);
+        ArrayList<String> pathArrayList = mediaFactory
+                .onActivityResult(requestCode, resultCode, data);
         if (pathArrayList.size() != 0) {
             imageList.add(pathArrayList.get(0));
             if (clickedPosition == 1) {
@@ -266,12 +266,30 @@ public class EnrollmentActivity extends Activity implements View.OnClickListener
                 loadImageToView(pathArrayList.get(0), mImageView6);
             }
         }
-
     }
 
     private void loadImageToView(String imageUrl, ImageView imageView) {
         File f = new File(imageUrl);
         Picasso.with(this).load(f).into(imageView);
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(BitmapShareEvent event) {
+        Log.v("ahs", "ebent recieved");
+        /* Do something */
+    }
+
 
 }

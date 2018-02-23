@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.app.rekog.R;
@@ -25,7 +26,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.MyViewHolder
 
         public MyViewHolder(View view) {
             super(view);
-            progressImageView =  view.findViewById(R.id.photo_image);
+            progressImageView = view.findViewById(R.id.photo_image);
         }
     }
 
@@ -46,13 +47,17 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.MyViewHolder
         holder.progressImageView.setImageBitmap(bitmap);
     }
 
-
-    public void addItem(Bitmap photoItem){
+    public void addItem(Bitmap photoItem) {
         photoList.add(photoItem);
     }
+
     @Override
     public int getItemCount() {
         return photoList.size();
+    }
+
+    public ArrayList<Bitmap> getAllItems() {
+        return (ArrayList<Bitmap>) photoList;
     }
 }
 

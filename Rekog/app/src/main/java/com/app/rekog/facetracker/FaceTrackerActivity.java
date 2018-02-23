@@ -15,7 +15,6 @@
  */
 package com.app.rekog.facetracker;
 
-import com.app.rekog.base.Utility;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.CameraSource;
@@ -30,6 +29,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -47,7 +47,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.greenrobot.eventbus.EventBus;
+
 import com.app.rekog.R;
+import com.app.rekog.activity.EnrollmentActivity;
+import com.app.rekog.base.Utility;
+import com.app.rekog.events.BitmapShareEvent;
 import com.app.rekog.facetracker.ui.PhotoAdapter;
 import com.app.rekog.facetracker.ui.camera.CameraSourcePreview;
 import com.app.rekog.facetracker.ui.camera.GraphicOverlay;
@@ -59,6 +64,7 @@ import com.app.rekog.facetracker.ui.camera.GraphicOverlay;
 public final class FaceTrackerActivity extends AppCompatActivity {
 
     private static final String TAG = "FaceTracker";
+    public static final String EXTRA_ENROLLMENT_DATA = "extra_enrollment_data";
 
     private CameraSource mCameraSource = null;
 
@@ -137,7 +143,9 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                                                         @Override
                                                         public void onClick(DialogInterface dialog,
                                                                 int which) {
-
+                                                            images.add(
+                                                                    Utility.convertToBitmap(bytes));
+                                                            mPhotoAdapter.notifyDataSetChanged();
                                                         }
                                                     })
                                             .setPositiveButton("Exit",
@@ -145,18 +153,30 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                                                         public void onClick(DialogInterface dialog,
                                                                 int id) {
                                                             //do things
-
+                                                            Intent intent = new Intent(
+                                                                    FaceTrackerActivity.this,
+                                                                    EnrollmentActivity.class);
+                                                            startActivity(intent);
+                                                            EventBus.getDefault().postSticky(new BitmapShareEvent(mPhotoAdapter.getAllItems()));
+                                                            finish();
                                                         }
                                                     });
 
                                     final AlertDialog alert = builder.create();
                                     alert.show();
                                 } else if (images.size() == 6) {
-
+                                    Intent intent = new Intent(
+                                            FaceTrackerActivity.this,
+                                            EnrollmentActivity.class);
+                                    startActivity(intent);
+                                    EventBus.getDefault().postSticky(new BitmapShareEvent(mPhotoAdapter.getAllItems()));
+                                    finish();
+                                }else{
+                                    images.add(
+                                            Utility.convertToBitmap(bytes));
+                                    mPhotoAdapter.notifyDataSetChanged();
                                 }
-                                images.add(
-                                        Utility.convertToBitmap(bytes));
-                                mPhotoAdapter.notifyDataSetChanged();
+
                             }
                         });
                     } else {

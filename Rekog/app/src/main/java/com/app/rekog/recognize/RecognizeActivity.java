@@ -53,6 +53,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONException;
 
 import com.affectiva.android.affdex.sdk.Frame;
@@ -664,11 +665,11 @@ public class RecognizeActivity extends AppCompatActivity
 
     @Override
     public void onFaceDetectionStarted() {
+        drawingView.requestBitmap();
         leftMetricsLayout.animate().alpha(1); //make left and right metrics appear
         rightMetricsLayout.animate().alpha(1);
 
         resetFPSCalculations(); //Since the FPS may be different whether a face is being tracked or not, reset variables.
-        drawingView.requestBitmap();
     }
 
     @Override
@@ -1081,7 +1082,7 @@ public class RecognizeActivity extends AppCompatActivity
             @Override
             public void run() {
                 getImage(bitmap);
-//                processScreenshot(bitmap, STORE_RAW_SCREENSHOTS);
+                processScreenshot(bitmap, STORE_RAW_SCREENSHOTS);
             }
         });
     }
@@ -1121,4 +1122,17 @@ public class RecognizeActivity extends AppCompatActivity
         String api_key = "fd3287889f836397be1857dd4d0adb11";
         kairos.setAuthentication(this, app_id, api_key);
     }
+
+    @Override
+    public void hideExtraLayouts(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                leftMetricsLayout.setVisibility(View.GONE);
+                rightMetricsLayout.setVisibility(View.GONE);
+            }
+        });
+    }
+
+
 }

@@ -291,6 +291,7 @@ public class DrawingView extends SurfaceView implements SurfaceHolder.Callback {
 
     interface DrawingThreadEventListener {
         void onBitmapGenerated(Bitmap bitmap);
+        void hideExtraLayouts();
     }
 
     class FacesSharer {
@@ -404,11 +405,17 @@ public class DrawingView extends SurfaceView implements SurfaceHolder.Callback {
                     c = mSurfaceHolder.lockCanvas();
 
                     if (requestCaptureBitmap) {
+                        if(listener!=null)
+                            listener.hideExtraLayouts();
+                        trackingPointsPaint.setAlpha(0);
+                        boundingBoxPaint.setAlpha(0);
+                        dominantEmotionScoreBarPaint.setAlpha(0);
                         Rect surfaceBounds = mSurfaceHolder.getSurfaceFrame();
                         screenshotBitmap = Bitmap
                                 .createBitmap(surfaceBounds.width(), surfaceBounds.height(), Bitmap.Config.ARGB_8888);
                         screenshotCanvas = new Canvas(screenshotBitmap);
                         requestCaptureBitmap = false;
+
                     }
 
                     if (c != null) {
@@ -426,6 +433,9 @@ public class DrawingView extends SurfaceView implements SurfaceHolder.Callback {
                         listener.onBitmapGenerated(Bitmap.createBitmap(screenshotBitmap));
                         screenshotBitmap.recycle();
                     }
+                    trackingPointsPaint.setAlpha(255);
+                    boundingBoxPaint.setAlpha(255);
+                    dominantEmotionScoreBarPaint.setAlpha(255);
                 }
             }
 

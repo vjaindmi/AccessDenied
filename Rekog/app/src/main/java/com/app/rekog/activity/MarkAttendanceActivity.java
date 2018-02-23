@@ -121,6 +121,7 @@ public final class MarkAttendanceActivity extends AppCompatActivity implements K
                     al.add(timeStamp);
                     user.setTime(al);
                     RealmDatabaseController.getInstance().insertUser(user);
+                    Log.i("Realm", "user inserted: - "+user.getName());
 
                 }
             }

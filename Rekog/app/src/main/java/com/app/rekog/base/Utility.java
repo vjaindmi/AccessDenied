@@ -218,7 +218,8 @@ public class Utility {
                         ExifInterface.TAG_ORIENTATION, 0);
                 Log.d("EXIF", "Exif: " + orientation);
                 Matrix matrix = new Matrix();
-                if (orientation == 6) {
+                matrix.postRotate(270);
+                /*if (orientation == 6) {
                     matrix.postRotate(90);
                     Log.d("EXIF", "Exif: " + orientation);
                 } else if (orientation == 3) {
@@ -227,7 +228,7 @@ public class Utility {
                 } else if (orientation == 8) {
                     matrix.postRotate(270);
                     Log.d("EXIF", "Exif: " + orientation);
-                }
+                }*/
                 scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0,
                         scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix,
                         true);

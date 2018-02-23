@@ -1243,6 +1243,7 @@ public class RecognizeActivity extends AppCompatActivity
                 al.add(timeStamp);
                 user.setTime(al);
                 RealmDatabaseController.getInstance().insertUser(user);
+                Log.i("Realm", "user inserted: - "+user.getName());
 
                 relativeLayout.setVisibility(View.VISIBLE);
                 ImageView leftImage = findViewById(R.id.left_image);

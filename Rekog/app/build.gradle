@@ -30,5 +30,5 @@ dependencies {
     compile 'com.squareup.okhttp3:logging-interceptor:3.9.1'
     compile 'io.realm:android-adapters:2.0.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.affectiva.android:affdexsdk:3.2'
+    compile 'com.affectiva.android:affdexsdk:3.+'
 }

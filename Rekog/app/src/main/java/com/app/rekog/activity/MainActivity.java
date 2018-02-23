@@ -12,6 +12,8 @@ import android.widget.Toast;
 import com.app.rekog.R;
 import com.app.rekog.beans.ResultBean;
 import com.google.gson.Gson;
+
+import com.app.rekog.recognize.RecognizeActivity;
 import com.kairos.Kairos;
 import com.kairos.KairosListener;
 import com.rahul.media.main.MediaFactory;
@@ -115,8 +117,9 @@ public class MainActivity extends Activity implements KairosListener, View.OnCli
 //                startActivity(new Intent(this, EnrollmentActivity.class));
                 break;
             case R.id.recognise_button:
-                isRecogniseImage = true;
-                openCamera();
+//                isRecogniseImage = true;
+//                openCamera();
+                startActivity(new Intent(this, RecognizeActivity.class));
                 break;
             case R.id.mark_attendance_button:
                 break;

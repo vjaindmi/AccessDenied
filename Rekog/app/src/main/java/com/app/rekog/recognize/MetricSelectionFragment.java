@@ -31,7 +31,7 @@ import java.util.HashMap;
 
 import com.app.rekog.R;
 
-import static com.app.rekog.recognize.MainActivity.NUM_METRICS_DISPLAYED;
+import static com.app.rekog.recognize.RecognizeActivity.NUM_METRICS_DISPLAYED;
 
 /**
  * A fragment to display a graphical menu which allows the user to select which metrics to display.

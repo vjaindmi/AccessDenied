@@ -82,12 +82,12 @@ import com.app.rekog.R;
  * - Copy the contents of the SDK's libs folder into this project's libs folder under AffdexMe/app/lib
  * - Copy the armeabi-v7a folder (found in the SDK libs folder) into this project's jniLibs folder under AffdexMe/app/src/main/jniLibs
  * - Add your license file to the assets/Affdex folder and rename to license.txt.
- * (Note: if you name the license file something else you will need to update the licensePath in the initializeCameraDetector() method in MainActivity)
+ * (Note: if you name the license file something else you will need to update the licensePath in the initializeCameraDetector() method in RecognizeActivity)
  * - Build the project
  * - Run the app on an Android device with a front-facing camera
  */
 
-public class MainActivity extends AppCompatActivity
+public class RecognizeActivity extends AppCompatActivity
         implements Detector.FaceListener, Detector.ImageListener, CameraDetector.CameraEventListener,
         View.OnTouchListener, ActivityCompat.OnRequestPermissionsResultCallback, DrawingView.DrawingThreadEventListener {
 
@@ -278,7 +278,7 @@ public class MainActivity extends AppCompatActivity
 
     private void showPermissionExplanationDialog(int requestCode) {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                MainActivity.this);
+                RecognizeActivity.this);
 
         // set title
         alertDialogBuilder.setTitle(getResources().getString(R.string.insufficient_permissions));

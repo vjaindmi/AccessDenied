@@ -1,46 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:layout_collapseMode="pin"
+        app:layout_scrollFlags="scroll|enterAlways"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:subtitleTextColor="@android:color/white"
+        app:titleTextColor="@android:color/white" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_margin="10dp"
+        android:layout_marginTop="50dp"
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/name_et"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:drawable/editbox_background_normal"
-            android:hint="@string/user_name"
-            android:padding="10dp" />
+            android:padding="@dimen/margin_10">
 
-        <EditText
-            android:id="@+id/email_et"
+            <EditText
+                android:id="@+id/name_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/user_name"
+                android:text="Rahul"
+                android:textSize="15sp" />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@android:drawable/editbox_background_normal"
-            android:hint="@string/email"
-            android:inputType="textEmailAddress"
-            android:padding="10dp" />
+            android:padding="@dimen/margin_10">
+
+            <EditText
+                android:id="@+id/email_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="rahul@gmail.com"
+                android:hint="@string/email"
+                android:inputType="textEmailAddress"
+                android:padding="10dp"
+                android:textSize="15sp" />
+        </android.support.design.widget.TextInputLayout>
 
         <TextView
             android:id="@+id/enroll_user_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@color/blue_03A9F4"
+            android:layout_marginTop="30dp"
+            android:background="@color/colorAccent"
             android:gravity="center"
             android:padding="10dp"
-            android:text="Upload Images"
-            android:textColor="@android:color/black"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:text="@string/upload_images"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
 
 
         <FrameLayout

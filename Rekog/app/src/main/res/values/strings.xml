@@ -6,8 +6,9 @@
     <string name="please_wait">Please wait …</string>
     <string name="enroll">Enroll</string>
     <string name="enter_user_name">Please enter user name.</string>
-    <string name="email">User Email</string>
-    <string name="enter_user_email">Please enter user email.</string>
+    <string name="email">Email Address</string>
+    <string name="enter_user_email">Please enter email.</string>
+    <string name="enter_valid_email">Please enter valid email.</string>
 
     <string name="not_found">Sorry, AffdexMe requires the use of a front-facing camera, which was not found on your device.</string>
     <string name="affectiva_logo_content_description">Affectiva Logo</string>
@@ -52,5 +53,8 @@
     <string name="ok">OK</string>
     <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
     <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
+    <string name="no_storage_permission">This application cannot run because it does not have the storage permission.  The application will now exit.</string>
     <string name="low_storage_error">Face detector dependencies cannot be downloaded due to low device storage</string>
+    <string name="upload_images">Upload Images</string>
+    <string name="already_enrolled">You are already enrolled</string>
 </resources>

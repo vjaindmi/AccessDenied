@@ -1,6 +1,6 @@
 package com.app.rekog.events;
 
-import android.graphics.Bitmap;
+import com.app.rekog.beans.BitmapBean;
 import java.util.ArrayList;
 
 /**
@@ -9,14 +9,14 @@ import java.util.ArrayList;
 
 public class BitmapShareEvent {
 
-    private ArrayList<Bitmap> mBitmapArrayList;
+    private ArrayList<BitmapBean> mBitmapArrayList;
 
-    public BitmapShareEvent(ArrayList<Bitmap> mBitmapArrayList) {
+    public BitmapShareEvent(ArrayList<BitmapBean> mBitmapArrayList) {
 
         this.mBitmapArrayList = mBitmapArrayList;
     }
 
-    public ArrayList<Bitmap> getBitmapArrayList() {
+    public ArrayList<BitmapBean> getBitmapArrayList() {
         return mBitmapArrayList;
     }
 }

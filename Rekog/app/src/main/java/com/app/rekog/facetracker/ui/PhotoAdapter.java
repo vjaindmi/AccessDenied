@@ -4,21 +4,19 @@ package com.app.rekog.facetracker.ui;
  * Created by Sdixit on 2/23/2018.
  */
 
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import com.app.rekog.R;
+import com.app.rekog.beans.BitmapBean;
+import com.bumptech.glide.Glide;
+import java.util.ArrayList;
 
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.MyViewHolder> {
 
-    private List<Bitmap> photoList;
+    private ArrayList<BitmapBean> photoList;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
@@ -30,7 +28,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.MyViewHolder
         }
     }
 
-    public PhotoAdapter(List<Bitmap> photoList) {
+    public PhotoAdapter(ArrayList<BitmapBean> photoList) {
         this.photoList = photoList;
     }
 
@@ -43,12 +41,9 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.MyViewHolder
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        Bitmap bitmap = photoList.get(position);
-        holder.progressImageView.setImageBitmap(bitmap);
-    }
-
-    public void addItem(Bitmap photoItem) {
-        photoList.add(photoItem);
+        String bitmap = photoList.get(position).filePath;
+        Glide.with(holder.progressImageView.getContext()).load(bitmap).placeholder(R.drawable.placeholder_470x352)
+                .into(holder.progressImageView);
     }
 
     @Override
@@ -56,8 +51,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.MyViewHolder
         return photoList.size();
     }
 
-    public ArrayList<Bitmap> getAllItems() {
-        return (ArrayList<Bitmap>) photoList;
+    public ArrayList<BitmapBean> getAllItems() {
+        return photoList;
     }
 }
 

@@ -15,14 +15,6 @@
  */
 package com.app.rekog.facetracker;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.vision.CameraSource;
-import com.google.android.gms.vision.MultiProcessor;
-import com.google.android.gms.vision.Tracker;
-import com.google.android.gms.vision.face.Face;
-import com.google.android.gms.vision.face.FaceDetector;
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -31,7 +23,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -43,21 +35,25 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.greenrobot.eventbus.EventBus;
-
 import com.app.rekog.R;
 import com.app.rekog.activity.EnrollmentActivity;
 import com.app.rekog.base.Utility;
+import com.app.rekog.beans.BitmapBean;
+import com.app.rekog.customui.MaterialProgressDialog;
 import com.app.rekog.events.BitmapShareEvent;
 import com.app.rekog.facetracker.ui.PhotoAdapter;
 import com.app.rekog.facetracker.ui.camera.CameraSourcePreview;
 import com.app.rekog.facetracker.ui.camera.GraphicOverlay;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.vision.CameraSource;
+import com.google.android.gms.vision.MultiProcessor;
+import com.google.android.gms.vision.Tracker;
+import com.google.android.gms.vision.face.Face;
+import com.google.android.gms.vision.face.FaceDetector;
+import java.io.IOException;
+import java.util.ArrayList;
+import org.greenrobot.eventbus.EventBus;
 
 /**
  * Activity for the face tracker app.  This app detects faces with the rear facing camera, and draws
@@ -66,23 +62,36 @@ import com.app.rekog.facetracker.ui.camera.GraphicOverlay;
 public final class FaceTrackerActivity extends AppCompatActivity {
 
     private static final String TAG = "FaceTracker";
+
     public static final String EXTRA_ENROLLMENT_DATA = "extra_enrollment_data";
+
+    private static final int MIN_THRESHOLD = 1;
+
+    private static final int MAX_THRESHOLD = 6;
 
     private CameraSource mCameraSource = null;
 
+    private MaterialProgressDialog mMaterialProgressDialog;
+
     private CameraSourcePreview mPreview;
+
     private GraphicOverlay mGraphicOverlay;
 
     private static final int RC_HANDLE_GMS = 9001;
+
     // permission request codes need to be < 256
     private static final int RC_HANDLE_CAMERA_PERM = 2;
 
-    private Button captureButton;
+    private View captureButton;
 
     private RecyclerView mRecyclerView;
-    private List<Bitmap> images = new ArrayList<>();
+
+    private ArrayList<BitmapBean> mBitmapArrayList = new ArrayList<>();
+
     private PhotoAdapter mPhotoAdapter;
+
     private GraphicOverlay mOverlay;
+
     private FaceGraphic mFaceGraphic;
 
     //==============================================================================================
@@ -97,8 +106,8 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         super.onCreate(icicle);
         setContentView(R.layout.activity_face_tracker);
 
-        mPreview = (CameraSourcePreview) findViewById(R.id.preview);
-        mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
+        mPreview = findViewById(R.id.preview);
+        mGraphicOverlay = findViewById(R.id.faceOverlay);
 
         captureButton = findViewById(R.id.capture_button);
         mRecyclerView = findViewById(R.id.photo_progress_recycler_view);
@@ -106,7 +115,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                 = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mPhotoAdapter = new PhotoAdapter(images);
+        mPhotoAdapter = new PhotoAdapter(mBitmapArrayList);
         mRecyclerView.setAdapter(mPhotoAdapter);
 
         // Check for the camera permission before accessing the camera.  If the
@@ -123,7 +132,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.CAMERA)
                         == PackageManager.PERMISSION_GRANTED) {
-                    if (mOverlay.isGraphicOverlayDetected()) {
+                    if (mOverlay != null && mOverlay.isGraphicOverlayDetected()) {
                         mCameraSource.takePicture(new CameraSource.ShutterCallback() {
                             @Override
                             public void onShutter() {
@@ -133,7 +142,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                             @Override
                             public void onPictureTaken(final byte[] bytes) {
 
-                                if (images.size() == 3) {
+                                if (mBitmapArrayList.size() == MIN_THRESHOLD) {
                                     AlertDialog.Builder builder = new AlertDialog.Builder(
                                             FaceTrackerActivity.this);
                                     builder.setTitle("Prompt!");
@@ -145,9 +154,8 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                                                         @Override
                                                         public void onClick(DialogInterface dialog,
                                                                 int which) {
-                                                            images.add(
-                                                                    Utility.convertToBitmap(bytes));
-                                                            mPhotoAdapter.notifyDataSetChanged();
+                                                            CompressAsync compressAsync = new CompressAsync(bytes);
+                                                            compressAsync.execute();
                                                         }
                                                     })
                                             .setPositiveButton("Exit",
@@ -155,34 +163,32 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                                                         public void onClick(DialogInterface dialog,
                                                                 int id) {
                                                             //do things
-                                                            Intent intent = new Intent(
-                                                                    FaceTrackerActivity.this,
-                                                                    EnrollmentActivity.class);
-                                                            startActivity(intent);
-                                                            EventBus.getDefault().postSticky(new BitmapShareEvent(mPhotoAdapter.getAllItems()));
+                                                            setResult(Activity.RESULT_OK);
+                                                            EventBus.getDefault().post(new BitmapShareEvent(
+                                                                    mPhotoAdapter.getAllItems()));
                                                             finish();
                                                         }
                                                     });
 
                                     final AlertDialog alert = builder.create();
                                     alert.show();
-                                } else if (images.size() == 6) {
+                                } else if (mBitmapArrayList.size() == MAX_THRESHOLD) {
                                     Intent intent = new Intent(
                                             FaceTrackerActivity.this,
                                             EnrollmentActivity.class);
                                     startActivity(intent);
-                                    EventBus.getDefault().postSticky(new BitmapShareEvent(mPhotoAdapter.getAllItems()));
+                                    EventBus.getDefault()
+                                            .postSticky(new BitmapShareEvent(mPhotoAdapter.getAllItems()));
                                     finish();
-                                }else{
-                                    images.add(
-                                            Utility.convertToBitmap(bytes));
-                                    mPhotoAdapter.notifyDataSetChanged();
+                                } else {
+                                    CompressAsync compressAsync = new CompressAsync(bytes);
+                                    compressAsync.execute();
                                     new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                                         @Override
                                         public void run() {
                                             mRecyclerView.scrollToPosition(mPhotoAdapter.getItemCount());
                                         }
-                                    },300);
+                                    }, 300);
                                 }
 
                             }
@@ -195,6 +201,56 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    /**
+     * Method to show blocking progress dialog
+     */
+    private void showProgressDialog(boolean iShow) {
+        if (mMaterialProgressDialog == null) {
+            mMaterialProgressDialog = Utility.getProgressDialogInstance(this);
+        }
+        try {
+            if (iShow) {
+                mMaterialProgressDialog.show();
+            } else {
+                mMaterialProgressDialog.dismiss();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private class CompressAsync extends AsyncTask<Void, Void, Void> {
+
+        private byte[] mByteArray;
+
+        public CompressAsync(byte[] byteArray) {
+            mByteArray = byteArray;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showProgressDialog(true);
+        }
+
+        @Override
+        protected Void doInBackground(final Void... voids) {
+            mBitmapArrayList.add(
+                    Utility.convertToBitmap(FaceTrackerActivity.this,
+                            mByteArray));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(final Void aVoid) {
+            super.onPostExecute(aVoid);
+            showProgressDialog(false);
+
+            mPhotoAdapter.notifyDataSetChanged();
+        }
     }
 
     /**
@@ -304,11 +360,11 @@ public final class FaceTrackerActivity extends AppCompatActivity {
      * and results arrays which should be treated as a cancellation.
      * </p>
      *
-     * @param requestCode The request code passed in {@link #requestPermissions(String[], int)}.
-     * @param permissions The requested permissions. Never null.
+     * @param requestCode  The request code passed in {@link #requestPermissions(String[], int)}.
+     * @param permissions  The requested permissions. Never null.
      * @param grantResults The grant results for the corresponding permissions
-     * which is either {@link PackageManager#PERMISSION_GRANTED}
-     * or {@link PackageManager#PERMISSION_DENIED}. Never null.
+     *                     which is either {@link PackageManager#PERMISSION_GRANTED}
+     *                     or {@link PackageManager#PERMISSION_DENIED}. Never null.
      * @see #requestPermissions(String[], int)
      */
     @Override

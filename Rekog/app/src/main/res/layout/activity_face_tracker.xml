@@ -1,48 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:id="@+id/topLayout"
-                xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:keepScreenOn="true"
-                android:orientation="vertical">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:keepScreenOn="true"
+    android:orientation="vertical">
+
+    <com.app.rekog.facetracker.ui.camera.CameraSourcePreview
+        android:id="@+id/preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.app.rekog.facetracker.ui.camera.GraphicOverlay
+            android:id="@+id/faceOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </com.app.rekog.facetracker.ui.camera.CameraSourcePreview>
 
     <android.support.v7.widget.RecyclerView
-            android:id="@+id/photo_progress_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true" />
+        android:id="@+id/photo_progress_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="#4D000000" />
 
     <LinearLayout
-            android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/capture_button"
-            android:layout_below="@+id/photo_progress_recycler_view"
-            android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="#4D000000"
+        android:gravity="center"
+        android:orientation="horizontal">
 
-        <com.app.rekog.facetracker.ui.camera.CameraSourcePreview
-                android:id="@+id/preview"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            <com.app.rekog.facetracker.ui.camera.GraphicOverlay
-                    android:id="@+id/faceOverlay"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-        </com.app.rekog.facetracker.ui.camera.CameraSourcePreview>
-    </LinearLayout>
-
-    <Button
+        <ImageView
             android:id="@+id/capture_button"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:layout_alignParentBottom="true"
-            android:background="#007299"
-            android:text="Capture"
+            android:src="@drawable/camera_shutter"
             android:textColor="@android:color/white"
-            android:textStyle="bold">
+            android:textStyle="bold"
+            android:tint="@android:color/white" />
 
-    </Button>
-
-</RelativeLayout>
+    </LinearLayout>
+</FrameLayout>

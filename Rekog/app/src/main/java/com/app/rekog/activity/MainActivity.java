@@ -8,26 +8,20 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
 import com.app.rekog.R;
-import com.app.rekog.beans.EmotionResponse;
 import com.app.rekog.beans.ResultBean;
-import com.app.rekog.network.ApiClient;
-import com.app.rekog.network.ApiInterface;
 import com.google.gson.Gson;
 import com.kairos.Kairos;
 import com.kairos.KairosListener;
 import com.rahul.media.main.MediaFactory;
 import com.rahul.media.model.Define;
+
+import org.json.JSONException;
+
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import org.json.JSONException;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends Activity implements KairosListener, View.OnClickListener {
 
@@ -53,9 +47,6 @@ public class MainActivity extends Activity implements KairosListener, View.OnCli
         findViewById(R.id.image_button).setOnClickListener(this);
         findViewById(R.id.recognise_button).setOnClickListener(this);
         findViewById(R.id.mark_attendance_button).setOnClickListener(this);
-
-        getAllGallery();
-//        Define.ACTIONBAR_COLOR = getResources().getColor(R.color.blue_03A9F4);
     }
 
     private void initializeSdk() {
@@ -64,54 +55,10 @@ public class MainActivity extends Activity implements KairosListener, View.OnCli
         kairos.setAuthentication(this, app_id, api_key);
     }
 
-    private void enrollImage(String imageUrl) {
-        String subjectId = "Bhavya";
-        String galleryId = getString(R.string.gallery_name);
-        try {
-            kairos.enroll(getBitmap(imageUrl), subjectId, galleryId, null, null, null, this);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void deleteGallery() {
-        String galleryId = getString(R.string.gallery_name);
-        try {
-            kairos.deleteGallery(galleryId, this);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void getImage(Bitmap imageUrl) {
         String galleryId = getString(R.string.gallery_name);
         try {
             kairos.recognize(imageUrl, galleryId, null, null, null, null, this);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void getAllSubjects() {
-        String galleryId = getString(R.string.gallery_name);
-        try {
-            kairos.listSubjectsForGallery(galleryId, this);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void getAllGallery() {
-        try {
-            kairos.listGalleries(this);
         } catch (JSONException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
@@ -176,46 +123,6 @@ public class MainActivity extends Activity implements KairosListener, View.OnCli
         }
     }
 
-    private void detectEmotion(String enrolledImage) {
-        try {
-            kairos.detect(getBitmap(enrolledImage), null, null, this);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void checkEmotion(String enrolledImage) {
-        ApiInterface apiInterface = ApiClient.getClient().create(ApiInterface.class);
-
-        final File file;
-        MultipartBody.Part part = null;
-        try {
-            file = new File(enrolledImage);
-            RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-
-            part = MultipartBody.Part.createFormData("source", file.getName(), fileBody);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        Call<EmotionResponse> call3 = apiInterface.checkEmotion(part);
-
-        call3.enqueue(new Callback<EmotionResponse>() {
-            @Override
-            public void onResponse(Call<EmotionResponse> call, Response<EmotionResponse> response) {
-                EmotionResponse emotionResponse = response.body();
-
-            }
-
-            @Override
-            public void onFailure(Call<EmotionResponse> call, Throwable t) {
-                call.cancel();
-            }
-        });
-
-    }
 
     private Bitmap getBitmap(String enrolledImage) {
         File image = new File(enrolledImage);

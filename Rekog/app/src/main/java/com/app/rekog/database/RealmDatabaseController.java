@@ -1,6 +1,7 @@
 package com.app.rekog.database;
 
 import android.content.Context;
+import com.app.rekog.beans.users.User;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 

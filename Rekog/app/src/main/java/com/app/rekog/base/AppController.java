@@ -2,8 +2,8 @@ package com.app.rekog.base;
 
 import android.app.Application;
 import com.app.rekog.R;
+import com.app.rekog.database.RealmDatabaseController;
 import com.kairos.Kairos;
-import com.kairos.android.example.database.RealmDatabaseController;
 import com.rahul.media.model.Define;
 
 /**

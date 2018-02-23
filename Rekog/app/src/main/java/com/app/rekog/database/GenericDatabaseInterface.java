@@ -1,7 +1,7 @@
 package com.app.rekog.database;
 
 import android.content.Context;
-import com.kairos.android.example.User.UserInterface;
+import com.app.rekog.beans.users.UserInterface;
 
 /**
  * Created by akashdeep on 2/22/2018.

@@ -27,6 +27,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatTextView;
+import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -1221,7 +1222,7 @@ public class RecognizeActivity extends AppCompatActivity
         if (resultBean.images.size() != 0) {
             String subjectId = resultBean.images.get(0).transaction.subject_id;
 
-            if(subjectId!=null) {
+            if (subjectId != null) {
                 User user = new User();
                 if (subjectId.contains(Utility.KAIROS_SEPARATOR)) {
                     String[] split = subjectId.split(Utility.KAIROS_SEPARATOR);
@@ -1243,7 +1244,7 @@ public class RecognizeActivity extends AppCompatActivity
                 al.add(timeStamp);
                 user.setTime(al);
                 RealmDatabaseController.getInstance().insertUser(user);
-                Log.i("Realm", "user inserted: - "+user.getName());
+                Log.i("Realm", "user inserted: - " + user.getName());
 
                 relativeLayout.setVisibility(View.VISIBLE);
                 ImageView leftImage = findViewById(R.id.left_image);
@@ -1258,45 +1259,52 @@ public class RecognizeActivity extends AppCompatActivity
 
                 // generating integer
 
-                switch (emotionFactor) {
-                    case "sad":
-                        leftImage.setImageDrawable(getResources().getDrawable(R.drawable.sad_2));
-                        rightImage.setImageDrawable(getResources().getDrawable(R.drawable.sad_2));
-                        message.setText(
-                                RealmDatabaseController.getInstance().getSadEmotion(ran.nextInt(4))
-                                        .getSadGreeting());
-                        break;
-                    case "anger":
-                        leftImage.setImageDrawable(getResources().getDrawable(R.drawable.anger_1));
-                        rightImage.setImageDrawable(getResources().getDrawable(R.drawable.anger_2));
-                        message.setText(
-                                RealmDatabaseController.getInstance()
-                                        .getAngerEmotion(ran.nextInt(4))
-                                        .getAngerGreeting());
-                        break;
-                    case "joy":
-                        leftImage.setImageDrawable(getResources().getDrawable(R.drawable.happy_1));
-                        rightImage.setImageDrawable(getResources().getDrawable(R.drawable.happy_2));
-                        message.setText(
-                                RealmDatabaseController.getInstance().getJoyEmotion(ran.nextInt(4))
-                                        .getJoyGreeting());
-                        break;
-                    case "fear":
-                        leftImage.setImageDrawable(getResources().getDrawable(R.drawable.fear_1));
-                        rightImage.setImageDrawable(getResources().getDrawable(R.drawable.fear_2));
-                        message.setText(
-                                RealmDatabaseController.getInstance().getFearEmotion(ran.nextInt(4))
-                                        .getFearGreeting());
-                        break;
-                    case "surprise":
-                        leftImage.setImageDrawable(getResources().getDrawable(R.drawable.surprise_1));
-                        rightImage.setImageDrawable(getResources().getDrawable(R.drawable.surprise_2));
-                        message.setText(
-                                RealmDatabaseController.getInstance().getSurpriseEmotion(ran.nextInt(4))
-                                        .getSurpriseGreeting());
-                        break;
+                try {
+                    switch (emotionFactor) {
+                        case "sad":
+                            leftImage.setImageDrawable(getResources().getDrawable(R.drawable.sad_2));
+                            rightImage.setImageDrawable(getResources().getDrawable(R.drawable.sad_2));
+                            message.setText(
+                                    RealmDatabaseController.getInstance().getSadEmotion(ran.nextInt(4))
+                                            .getSadGreeting());
+                            break;
+                        case "anger":
+                            leftImage.setImageDrawable(getResources().getDrawable(R.drawable.anger_1));
+                            rightImage.setImageDrawable(getResources().getDrawable(R.drawable.anger_2));
+                            message.setText(
+                                    RealmDatabaseController.getInstance()
+                                            .getAngerEmotion(ran.nextInt(4))
+                                            .getAngerGreeting());
+                            break;
+                        case "joy":
+                            leftImage.setImageDrawable(getResources().getDrawable(R.drawable.happy_1));
+                            rightImage.setImageDrawable(getResources().getDrawable(R.drawable.happy_2));
+                            message.setText(
+                                    RealmDatabaseController.getInstance().getJoyEmotion(ran.nextInt(4))
+                                            .getJoyGreeting());
+                            break;
+                        case "fear":
+                            leftImage.setImageDrawable(getResources().getDrawable(R.drawable.fear_1));
+                            rightImage.setImageDrawable(getResources().getDrawable(R.drawable.fear_2));
+                            message.setText(
+                                    RealmDatabaseController.getInstance().getFearEmotion(ran.nextInt(4))
+                                            .getFearGreeting());
+                            break;
+                        case "surprise":
+                            leftImage.setImageDrawable(getResources().getDrawable(R.drawable.surprise_1));
+                            rightImage.setImageDrawable(getResources().getDrawable(R.drawable.surprise_2));
+                            message.setText(
+                                    RealmDatabaseController.getInstance().getSurpriseEmotion(ran.nextInt(4))
+                                            .getSurpriseGreeting());
+                            break;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    if (!TextUtils.isEmpty(user.getName())) {
+                        message.setText("Welcome!");
+                    }
                 }
-            }else{
+            } else {
                 relativeLayout.setVisibility(View.GONE);
                 Toast.makeText(getApplicationContext(), "User Not Found", Toast.LENGTH_SHORT).show();
             }
@@ -1308,23 +1316,22 @@ public class RecognizeActivity extends AppCompatActivity
     }
 
 
-
-    private String getCurrentEmotion(){
-        Log.d("RA","0:"+((AppCompatTextView) metricNames[0]).getText().toString());
-        Log.d("RA","1:"+((AppCompatTextView) metricNames[1]).getText().toString());
-        Log.d("RA","2:"+((AppCompatTextView) metricNames[2]).getText().toString());
-        Log.d("RA","3:"+((AppCompatTextView) metricNames[3]).getText().toString());
-        Log.d("RA","4:"+((AppCompatTextView) metricNames[4]).getText().toString());
-        Log.d("RA","5:"+((AppCompatTextView) metricNames[5]).getText().toString());
+    private String getCurrentEmotion() {
+        Log.d("RA", "0:" + ((AppCompatTextView) metricNames[0]).getText().toString());
+        Log.d("RA", "1:" + ((AppCompatTextView) metricNames[1]).getText().toString());
+        Log.d("RA", "2:" + ((AppCompatTextView) metricNames[2]).getText().toString());
+        Log.d("RA", "3:" + ((AppCompatTextView) metricNames[3]).getText().toString());
+        Log.d("RA", "4:" + ((AppCompatTextView) metricNames[4]).getText().toString());
+        Log.d("RA", "5:" + ((AppCompatTextView) metricNames[5]).getText().toString());
 
         float[] emo = new float[6];
 
-        emo[0]= metricDisplays[0].getScrore();
-        emo[1]= metricDisplays[1].getScrore();
-        emo[2]= metricDisplays[2].getScrore();
-        emo[3]= metricDisplays[3].getScrore();
-        emo[4]= metricDisplays[4].getScrore();
-        emo[5]= metricDisplays[5].getScrore();
+        emo[0] = metricDisplays[0].getScrore();
+        emo[1] = metricDisplays[1].getScrore();
+        emo[2] = metricDisplays[2].getScrore();
+        emo[3] = metricDisplays[3].getScrore();
+        emo[4] = metricDisplays[4].getScrore();
+        emo[5] = metricDisplays[5].getScrore();
 
         HashMap<Float, String> hm = new HashMap<>();
         hm.put(emo[0], "anger");
@@ -1335,8 +1342,6 @@ public class RecognizeActivity extends AppCompatActivity
         hm.put(emo[5], "surprise");
 
         Arrays.sort(emo);
-
-
 
         return hm.get(emo[5]);
     }

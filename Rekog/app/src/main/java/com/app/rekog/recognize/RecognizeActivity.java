@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -824,6 +825,11 @@ public class RecognizeActivity extends AppCompatActivity
         String fileSavedMessage = "Screenshot saved to: " + screenshotFile.getPath();
         Toast.makeText(getApplicationContext(), fileSavedMessage, Toast.LENGTH_SHORT).show();
         Log.d(LOG_TAG, fileSavedMessage);
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap bitmap = BitmapFactory.decodeFile(screenshotFile.getPath(), options);
+        getImage(bitmap);
     }
 
     /**
@@ -1081,7 +1087,7 @@ public class RecognizeActivity extends AppCompatActivity
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                getImage(bitmap);
+//                getImage(bitmap);
                 processScreenshot(bitmap, STORE_RAW_SCREENSHOTS);
             }
         });
@@ -1128,8 +1134,8 @@ public class RecognizeActivity extends AppCompatActivity
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                leftMetricsLayout.setVisibility(View.GONE);
-                rightMetricsLayout.setVisibility(View.GONE);
+//                leftMetricsLayout.setVisibility(View.GONE);
+//                rightMetricsLayout.setVisibility(View.GONE);
             }
         });
     }

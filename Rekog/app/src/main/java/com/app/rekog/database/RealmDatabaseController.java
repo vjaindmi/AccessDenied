@@ -9,6 +9,7 @@ import com.app.rekog.beans.emotions.DisgustEmotion;
 import com.app.rekog.beans.emotions.FearEmotion;
 import com.app.rekog.beans.emotions.JoyEmotion;
 import com.app.rekog.beans.emotions.SadEmotion;
+import com.app.rekog.beans.emotions.SurpriseEmotion;
 import com.app.rekog.beans.users.User;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -92,6 +93,13 @@ public class RealmDatabaseController implements GenericDatabaseInterface {
     }
 
     @Override
+    public void insertSurpriseEmotions(SurpriseEmotion surpriseEmotion) {
+        realm.beginTransaction();
+        realm.copyToRealmOrUpdate(surpriseEmotion);
+        realm.commitTransaction();
+    }
+
+    @Override
     public AngerEmotion getAngerEmotion(int id) {
          return realm.where(AngerEmotion.class).equalTo("id", id).findFirst();
     }
@@ -114,5 +122,10 @@ public class RealmDatabaseController implements GenericDatabaseInterface {
     @Override
     public SadEmotion getSadEmotion(int id) {
         return realm.where(SadEmotion.class).equalTo("id", id).findFirst();
+    }
+
+    @Override
+    public SurpriseEmotion getSurpriseEmotion(int id) {
+        return realm.where(SurpriseEmotion.class).equalTo("id", id).findFirst();
     }
 }

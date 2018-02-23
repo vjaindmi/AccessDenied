@@ -1178,6 +1178,7 @@ public class RecognizeActivity extends AppCompatActivity
     public void onSuccess(String response) {
         Log.d("KAIROS DEMO", response);
         Gson gson = new Gson();
+        RelativeLayout relativeLayout = findViewById(R.id.bottom_view);
         ResultBean resultBean = gson.fromJson(response, ResultBean.class);
         if (resultBean.images.size() != 0) {
             String subjectId = resultBean.images.get(0).transaction.subject_id;
@@ -1205,7 +1206,6 @@ public class RecognizeActivity extends AppCompatActivity
                 user.setTime(al);
                 RealmDatabaseController.getInstance().insertUser(user);
 
-                RelativeLayout relativeLayout = findViewById(R.id.bottom_view);
                 relativeLayout.setVisibility(View.VISIBLE);
                 ImageView leftImage = findViewById(R.id.left_image);
                 ImageView rightImage = findViewById(R.id.right_image);
@@ -1249,8 +1249,16 @@ public class RecognizeActivity extends AppCompatActivity
                                 RealmDatabaseController.getInstance().getFearEmotion(ran.nextInt(5))
                                         .getFearGreeting());
                         break;
+                    case "surprise":
+                        leftImage.setImageDrawable(getResources().getDrawable(R.drawable.surprise_1));
+                        rightImage.setImageDrawable(getResources().getDrawable(R.drawable.surprise_2));
+                        message.setText(
+                                RealmDatabaseController.getInstance().getSurpriseEmotion(ran.nextInt(5))
+                                        .getSurpriseGreeting());
+                        break;
                 }
             }else{
+                relativeLayout.setVisibility(View.GONE);
                 Toast.makeText(getApplicationContext(), "User Not Found", Toast.LENGTH_SHORT).show();
             }
         } else {

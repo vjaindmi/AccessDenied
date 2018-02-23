@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.app.rekog.R;
@@ -18,6 +17,7 @@ import com.app.rekog.beans.emotions.DisgustEmotion;
 import com.app.rekog.beans.emotions.FearEmotion;
 import com.app.rekog.beans.emotions.JoyEmotion;
 import com.app.rekog.beans.emotions.SadEmotion;
+import com.app.rekog.beans.emotions.SurpriseEmotion;
 import com.app.rekog.database.RealmDatabaseController;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -47,11 +47,16 @@ public class SplashActivity extends AppCompatActivity {
             RealmDatabaseController.getInstance().insertAngerEmotions(new AngerEmotion(5,
                     "Sometimes it took seconds to control your anger, only to avoid the state of eternal feud."));
 
-            RealmDatabaseController.getInstance().insertDisgustEmotions(new DisgustEmotion(1, ""));
-            RealmDatabaseController.getInstance().insertDisgustEmotions(new DisgustEmotion(2, ""));
-            RealmDatabaseController.getInstance().insertDisgustEmotions(new DisgustEmotion(3, ""));
-            RealmDatabaseController.getInstance().insertDisgustEmotions(new DisgustEmotion(4, ""));
-            RealmDatabaseController.getInstance().insertDisgustEmotions(new DisgustEmotion(5, ""));
+            RealmDatabaseController.getInstance().insertDisgustEmotions(new DisgustEmotion(1,
+                    "you are hard to disgust, but a pretentious poet can do it."));
+            RealmDatabaseController.getInstance().insertDisgustEmotions(
+                    new DisgustEmotion(2, "I had forgotten. Disgust shadows desire."));
+            RealmDatabaseController.getInstance().insertDisgustEmotions(new DisgustEmotion(3,
+                    "you are hard to disgust, but a pretentious poet can do it."));
+            RealmDatabaseController.getInstance().insertDisgustEmotions(
+                    new DisgustEmotion(4, "I had forgotten. Disgust shadows desire."));
+            RealmDatabaseController.getInstance().insertDisgustEmotions(new DisgustEmotion(5,
+                    "you are hard to disgust, but a pretentious poet can do it."));
 
             RealmDatabaseController.getInstance().insertFearEmotions(
                     new FearEmotion(1, "Do one thing every day that scares you."));
@@ -85,8 +90,19 @@ public class SplashActivity extends AppCompatActivity {
                     "Sadness brings nothing but boredom and we are sure you are not a bore person so please smile."));
             RealmDatabaseController.getInstance().insertSadEmotions(new SadEmotion(5,
                     "Life is too short to be sad for any reason. Increase you life and health by smiling toady."));
-            Log.v("Tag is that", " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ::::::::::::::: "
-                    + RealmDatabaseController.getInstance().getAngerEmotion(1).getAngerGreeting());
+
+            RealmDatabaseController.getInstance().insertSurpriseEmotions(new SurpriseEmotion(1,
+                    "The secret to humor is surprise."));
+            RealmDatabaseController.getInstance().insertSurpriseEmotions(
+                    new SurpriseEmotion(2,
+                            "Humor is a spontaneous, wonderful bit of an outburst that just comes. It's unbridled, its unplanned, it's full of suprises."));
+            RealmDatabaseController.getInstance().insertSurpriseEmotions(
+                    new SurpriseEmotion(3,
+                            "I try not to be surprised. Surprise is the public face of a mind that has been closed."));
+            RealmDatabaseController.getInstance().insertSurpriseEmotions(new SurpriseEmotion(4,
+                    "A pessimist gets nothing but pleasant surprises, an optimist nothing but unpleasant."));
+            RealmDatabaseController.getInstance().insertSurpriseEmotions(new SurpriseEmotion(5,
+                    "Magic is the stunning art of surprising your audience, so that nothing else surprises them."));
         }
 
         final ImageView imageView = findViewById(R.id.splash_logo);

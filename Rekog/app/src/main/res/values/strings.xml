@@ -3,6 +3,7 @@
     <string name="image_provider">com.app.rekog.provider</string>
     <string name="gallery_name">Test_Face_Images</string>
     <string name="user_name">User Name</string>
+    <string name="please_wait">Please wait …</string>
     <string name="enroll">Enroll</string>
     <string name="enter_user_name">Please enter user name</string>
 

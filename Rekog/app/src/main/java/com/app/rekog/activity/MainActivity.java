@@ -8,31 +8,37 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-
 import com.app.rekog.R;
+import com.app.rekog.base.Utility;
 import com.app.rekog.beans.ResultBean;
-import com.google.gson.Gson;
-
+import com.app.rekog.customui.MaterialProgressDialog;
 import com.app.rekog.recognize.RecognizeActivity;
+import com.google.gson.Gson;
 import com.kairos.Kairos;
 import com.kairos.KairosListener;
 import com.rahul.media.main.MediaFactory;
 import com.rahul.media.model.Define;
-
-import org.json.JSONException;
-
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import org.json.JSONException;
 
 public class MainActivity extends Activity implements KairosListener, View.OnClickListener {
 
+    private MaterialProgressDialog mMaterialProgressDialog;
+
     private MediaFactory.MediaBuilder mediaBuilder;
+
     private MediaFactory mediaFactory;
+
     private Kairos kairos = new Kairos();
+
     private String enrolledImage = "";
+
     private boolean isForEmotion = false;
+
     private boolean isRecogniseImage = false;
+
     private boolean isForEnroll = false;
 
 
@@ -131,5 +137,23 @@ public class MainActivity extends Activity implements KairosListener, View.OnCli
         File image = new File(enrolledImage);
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         return BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
+    }
+
+    /**
+     * Method to show blocking progress dialog
+     */
+    private void showProgressDialog(boolean iShow) {
+        if (mMaterialProgressDialog == null) {
+            mMaterialProgressDialog = Utility.getProgressDialogInstance(this);
+        }
+        try {
+            if (iShow) {
+                mMaterialProgressDialog.show();
+            } else {
+                mMaterialProgressDialog.dismiss();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

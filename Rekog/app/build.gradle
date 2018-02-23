@@ -22,7 +22,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation files('libs/KairosSDK.jar')
-
+    compile 'me.zhanghai.android.materialprogressbar:library:1.3.0'
     compile 'com.crop.multiple:multipleImagePickerLib:1.4.4'
     compile 'com.google.code.gson:gson:2.8.1'
     compile 'com.squareup.retrofit2:retrofit:2.1.0'

@@ -112,7 +112,7 @@ public class MainActivity extends Activity implements KairosListener, View.OnCli
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.image_button:
-                startActivity(new Intent(this, EnrollmentActivity.class));
+//                startActivity(new Intent(this, EnrollmentActivity.class));
                 break;
             case R.id.recognise_button:
                 isRecogniseImage = true;

@@ -2,14 +2,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.app.rekog">
 
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
-        android:allowBackup="true"
+            tools:replace="android:theme,android:label,android:allowBackup"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:allowBackup="false"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        tools:replace="theme,label">
+        android:theme="@style/AppTheme">
 
         <activity
             android:name=".activity.MainActivity"

@@ -31,4 +31,8 @@ dependencies {
     compile 'io.realm:android-adapters:2.0.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.affectiva.android:affdexsdk:3.+'
+    compile 'com.affectiva.android:affdexsdk:3.2'
+    compile 'com.android.support:support-v4:26.0.0'
+    compile 'com.android.support:design:26.1.0'
+    compile 'com.google.android.gms:play-services-vision:11.0.4+'
 }

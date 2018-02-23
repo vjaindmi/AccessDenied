@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.app.rekog.facetracker;
+package com.app.rekog.activity;
 
 import android.Manifest;
 import android.app.Activity;
@@ -21,28 +21,23 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.widget.Toast;
 import com.app.rekog.R;
-import com.app.rekog.activity.EnrollmentActivity;
 import com.app.rekog.base.Utility;
 import com.app.rekog.beans.BitmapBean;
+import com.app.rekog.beans.ResultBean;
+import com.app.rekog.beans.ResultBean.ImagesBean;
 import com.app.rekog.customui.MaterialProgressDialog;
-import com.app.rekog.events.BitmapShareEvent;
-import com.app.rekog.facetracker.ui.PhotoAdapter;
+import com.app.rekog.facetracker.FaceGraphic;
 import com.app.rekog.facetracker.ui.camera.CameraSourcePreview;
 import com.app.rekog.facetracker.ui.camera.GraphicOverlay;
 import com.google.android.gms.common.ConnectionResult;
@@ -52,23 +47,21 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.google.gson.Gson;
+import com.kairos.Kairos;
+import com.kairos.KairosListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import org.greenrobot.eventbus.EventBus;
 
 /**
  * Activity for the face tracker app.  This app detects faces with the rear facing camera, and draws
  * overlay graphics to indicate the position, size, and ID of each face.
  */
-public final class FaceTrackerActivity extends AppCompatActivity {
+public final class MarkAttendanceActivity extends AppCompatActivity implements KairosListener {
 
-    private static final String TAG = "FaceTracker";
+    private Kairos kairos = new Kairos();
 
-    public static final String EXTRA_ENROLLMENT_DATA = "extra_enrollment_data";
-
-    private static final int MIN_THRESHOLD = 1;
-
-    private static final int MAX_THRESHOLD = 6;
+    private static final String TAG = "MarkAttendanceActivity";
 
     private CameraSource mCameraSource = null;
 
@@ -85,21 +78,52 @@ public final class FaceTrackerActivity extends AppCompatActivity {
 
     private View captureButton;
 
-    private RecyclerView mRecyclerView;
-
     private ArrayList<BitmapBean> mBitmapArrayList = new ArrayList<>();
-
-    private PhotoAdapter mPhotoAdapter;
 
     private GraphicOverlay mOverlay;
 
     private FaceGraphic mFaceGraphic;
 
-    private View mSaveButton;
+    @Override
+    public void onSuccess(final String s) {
+        showProgressDialog(false);
+        if (!TextUtils.isEmpty(s)) {
+            Gson gson = new Gson();
+            ResultBean resultBean = gson.fromJson(s, ResultBean.class);
+            if (resultBean != null) {
+                if (resultBean.images != null && !resultBean.images.isEmpty()) {
+                    ImagesBean imagesBean = resultBean.images.get(0);
+                    String subjectId = imagesBean.transaction.subject_id;
+
+                    if (subjectId.contains(Utility.KAIROS_SEPARATOR)) {
+                        String[] split = subjectId.split(Utility.KAIROS_SEPARATOR);
+                        Toast.makeText(this, split[0] + " attendance marked", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, subjectId + " attendance marked", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            }
+        }
+        Log.i("Kairos", s);
+    }
+
+    @Override
+    public void onFail(final String s) {
+        showProgressDialog(false);
+        Toast.makeText(this, "Something went wrong. Please try again!", Toast.LENGTH_SHORT).show();
+        Log.i("Kairos", s);
+    }
 
     //==============================================================================================
     // Activity Methods
     //==============================================================================================
+
+    private void initializeSdk() {
+        String app_id = "c7d15241";
+        String api_key = "fd3287889f836397be1857dd4d0adb11";
+        kairos.setAuthentication(this, app_id, api_key);
+    }
 
     /**
      * Initializes the UI and initiates the creation of a face detector.
@@ -107,30 +131,12 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        setContentView(R.layout.activity_face_tracker);
-
-        mSaveButton = findViewById(R.id.save_tv);
-        mSaveButton.setVisibility(View.GONE);
-        mSaveButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(final View view) {
-                setResult(Activity.RESULT_OK);
-                EventBus.getDefault().post(new BitmapShareEvent(
-                        mPhotoAdapter.getAllItems()));
-                finish();
-            }
-        });
+        setContentView(R.layout.activity_mark_attendance);
+        initializeSdk();
         mPreview = findViewById(R.id.preview);
         mGraphicOverlay = findViewById(R.id.faceOverlay);
 
         captureButton = findViewById(R.id.capture_button);
-        mRecyclerView = findViewById(R.id.photo_progress_recycler_view);
-        LinearLayoutManager layoutManager
-                = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mPhotoAdapter = new PhotoAdapter(mBitmapArrayList);
-        mRecyclerView.setAdapter(mPhotoAdapter);
 
         // Check for the camera permission before accessing the camera.  If the
         // permission is not granted yet, request permission.
@@ -155,62 +161,11 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                         }, new CameraSource.PictureCallback() {
                             @Override
                             public void onPictureTaken(final byte[] bytes) {
-                                mSaveButton.setVisibility(View.VISIBLE);
-
-                                if (mBitmapArrayList.size() == MIN_THRESHOLD) {
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(
-                                            FaceTrackerActivity.this);
-                                    builder.setTitle("Prompt!");
-                                    builder.setMessage(
-                                            "Do you wish to add more or you want to exit.")
-                                            .setCancelable(false)
-                                            .setNegativeButton("Yes",
-                                                    new DialogInterface.OnClickListener() {
-                                                        @Override
-                                                        public void onClick(DialogInterface dialog,
-                                                                int which) {
-                                                            CompressAsync compressAsync = new CompressAsync(bytes);
-                                                            compressAsync.execute();
-                                                        }
-                                                    })
-                                            .setPositiveButton("Exit",
-                                                    new DialogInterface.OnClickListener() {
-                                                        public void onClick(DialogInterface dialog,
-                                                                int id) {
-                                                            //do things
-                                                            setResult(Activity.RESULT_OK);
-                                                            EventBus.getDefault().post(new BitmapShareEvent(
-                                                                    mPhotoAdapter.getAllItems()));
-                                                            finish();
-                                                        }
-                                                    });
-
-                                    final AlertDialog alert = builder.create();
-                                    alert.show();
-                                } else if (mBitmapArrayList.size() == MAX_THRESHOLD) {
-                                    Intent intent = new Intent(
-                                            FaceTrackerActivity.this,
-                                            EnrollmentActivity.class);
-                                    startActivity(intent);
-                                    EventBus.getDefault()
-                                            .postSticky(new BitmapShareEvent(mPhotoAdapter.getAllItems()));
-                                    finish();
-                                } else {
-                                    CompressAsync compressAsync = new CompressAsync(bytes);
-                                    compressAsync.execute();
-                                    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            mRecyclerView.scrollToPosition(mPhotoAdapter.getItemCount());
-                                        }
-                                    }, 300);
-                                }
-
+                                CompressAsync compressAsync = new CompressAsync(bytes);
+                                compressAsync.execute();
                             }
                         });
                     } else {
-                        if(mOverlay != null)
-                            mOverlay.clear();
                         Snackbar.make(captureButton, "Face is missing",
                                 Snackbar.LENGTH_LONG)
                                 .show();
@@ -256,7 +211,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(final Void... voids) {
             mBitmapArrayList.add(
-                    Utility.convertToBitmap(FaceTrackerActivity.this,
+                    Utility.convertToBitmap(MarkAttendanceActivity.this,
                             mByteArray));
             return null;
         }
@@ -265,10 +220,24 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         protected void onPostExecute(final Void aVoid) {
             super.onPostExecute(aVoid);
             showProgressDialog(false);
-
-            mPhotoAdapter.notifyDataSetChanged();
+            recognise();
         }
     }
+
+    private void recognise() {
+        BitmapBean bitmapBean = mBitmapArrayList.get(0);
+        String galleryId = getString(R.string.gallery_name);
+        showProgressDialog(true);
+        try {
+
+            kairos.recognize(bitmapBean.bitmap, galleryId, null, null, null,
+                    null, this);
+        } catch (Exception e) {
+            showProgressDialog(false);
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * Handles the requesting of the camera permission.  This includes

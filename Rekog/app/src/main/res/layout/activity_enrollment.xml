@@ -164,7 +164,7 @@
         android:id="@+id/enroll_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/blue_03A9F4"
+        android:background="@color/colorPrimary"
         android:gravity="center"
         android:padding="10dp"
         android:text="@string/enroll"

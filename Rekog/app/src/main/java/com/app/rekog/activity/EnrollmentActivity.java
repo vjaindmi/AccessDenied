@@ -76,6 +76,11 @@ public class EnrollmentActivity extends Activity implements View.OnClickListener
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enrollment);
+
+        if (mMaterialProgressDialog == null) {
+            mMaterialProgressDialog = Utility.getProgressDialogInstance(this);
+        }
+
         EventBus.getDefault().register(this);
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Enroll");
@@ -225,7 +230,8 @@ public class EnrollmentActivity extends Activity implements View.OnClickListener
 
     private void enrollImage(BitmapBean bitmapBean) {
         showProgressDialog(true);
-        String subjectId = mNameEd.getText().toString();
+        String subjectId = mNameEd.getText().toString() + Utility.KAIROS_SEPARATOR + mEmailEd.getText().toString()
+                .trim();
         String galleryId = getString(R.string.gallery_name);
         try {
             kairos.enroll(bitmapBean.bitmap, subjectId, galleryId, null, null, null, this);
@@ -234,7 +240,6 @@ public class EnrollmentActivity extends Activity implements View.OnClickListener
             e.printStackTrace();
         }
     }
-
 
 
     @Override
@@ -253,7 +258,14 @@ public class EnrollmentActivity extends Activity implements View.OnClickListener
             if (currentIndex == imageList.size()) {
                 postUserData();
                 mProgressBar.setVisibility(View.GONE);
-                Toast.makeText(this, userName + " enrolled successfully", Toast.LENGTH_SHORT).show();
+                if (userName.contains(Utility.KAIROS_SEPARATOR)) {
+                    String[] split = userName.split(Utility.KAIROS_SEPARATOR);
+                    Toast.makeText(this, split[0] + " enrolled successfully", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, userName + " enrolled successfully", Toast.LENGTH_SHORT).show();
+                }
+
+                finish();
             }
         }
     }

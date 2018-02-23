@@ -27,31 +27,37 @@ import com.app.rekog.facetracker.ui.camera.GraphicOverlay;
  * Graphic instance for rendering face position, orientation, and landmarks within an associated
  * graphic overlay view.
  */
-class FaceGraphic extends GraphicOverlay.Graphic {
+public class FaceGraphic extends GraphicOverlay.Graphic {
 
     private static final float ID_TEXT_SIZE = 40.0f;
+
     private static final float BOX_STROKE_WIDTH = 5.0f;
 
     private static final int COLOR_CHOICES[] = {
-        Color.BLUE,
-        Color.CYAN,
-        Color.GREEN,
-        Color.MAGENTA,
-        Color.RED,
-        Color.WHITE,
-        Color.YELLOW
+            Color.BLUE,
+            Color.CYAN,
+            Color.GREEN,
+            Color.MAGENTA,
+            Color.RED,
+            Color.WHITE,
+            Color.YELLOW
     };
+
     private static int mCurrentColorIndex = 0;
 
     private Paint mFacePositionPaint;
+
     private Paint mIdPaint;
+
     private Paint mBoxPaint;
 
     private volatile Face mFace;
+
     private int mFaceId;
+
     private float mFaceHappiness;
 
-    FaceGraphic(GraphicOverlay overlay) {
+    public FaceGraphic(GraphicOverlay overlay) {
         super(overlay);
 
         mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.length;
@@ -70,7 +76,7 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         mBoxPaint.setStrokeWidth(BOX_STROKE_WIDTH);
     }
 
-    void setId(int id) {
+    public void setId(int id) {
         mFaceId = id;
     }
 
@@ -79,7 +85,7 @@ class FaceGraphic extends GraphicOverlay.Graphic {
      * Updates the face instance from the detection of the most recent frame.  Invalidates the
      * relevant portions of the overlay to trigger a redraw.
      */
-    void updateFace(Face face) {
+    public void updateFace(Face face) {
         mFace = face;
         postInvalidate();
     }

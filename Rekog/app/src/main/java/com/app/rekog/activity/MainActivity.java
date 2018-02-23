@@ -67,6 +67,7 @@ public class MainActivity extends Activity implements KairosListener, View.OnCli
         findViewById(R.id.image_button).setOnClickListener(this);
         findViewById(R.id.recognise_button).setOnClickListener(this);
         findViewById(R.id.mark_attendance_button).setOnClickListener(this);
+        findViewById(R.id.delete).setOnClickListener(this);
 
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (rc != PackageManager.PERMISSION_GRANTED) {
@@ -180,6 +181,9 @@ public class MainActivity extends Activity implements KairosListener, View.OnCli
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.delete:
+                deleteGallery();
+                break;
             case R.id.image_button:
                 startActivity(new Intent(this, EnrollmentActivity.class));
                 break;
@@ -189,6 +193,7 @@ public class MainActivity extends Activity implements KairosListener, View.OnCli
                 startActivity(new Intent(this, RecognizeActivity.class));
                 break;
             case R.id.mark_attendance_button:
+                startActivity(new Intent(MainActivity.this, MarkAttendanceActivity.class));
                 break;
         }
     }
@@ -198,6 +203,17 @@ public class MainActivity extends Activity implements KairosListener, View.OnCli
         File image = new File(enrolledImage);
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         return BitmapFactory.decodeFile(image.getAbsolutePath(), bmOptions);
+    }
+
+    private void deleteGallery() {
+        String galleryId = getString(R.string.gallery_name);
+        try {
+            kairos.deleteGallery(galleryId, this);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

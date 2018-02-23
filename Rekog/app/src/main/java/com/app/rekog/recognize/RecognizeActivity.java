@@ -5,6 +5,8 @@
 
 package com.app.rekog.recognize;
 
+import com.google.gson.Gson;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -44,11 +46,14 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import org.json.JSONException;
 
 import com.affectiva.android.affdex.sdk.Frame;
 import com.affectiva.android.affdex.sdk.Frame.ROTATE;
@@ -56,6 +61,10 @@ import com.affectiva.android.affdex.sdk.detector.CameraDetector;
 import com.affectiva.android.affdex.sdk.detector.Detector;
 import com.affectiva.android.affdex.sdk.detector.Face;
 import com.app.rekog.R;
+import com.app.rekog.base.AppController;
+import com.app.rekog.beans.ResultBean;
+import com.kairos.Kairos;
+import com.kairos.KairosListener;
 
 /*
  * AffdexMe is an app that demonstrates the use of the Affectiva Android SDK.  It uses the
@@ -89,7 +98,8 @@ import com.app.rekog.R;
 
 public class RecognizeActivity extends AppCompatActivity
         implements Detector.FaceListener, Detector.ImageListener, CameraDetector.CameraEventListener,
-        View.OnTouchListener, ActivityCompat.OnRequestPermissionsResultCallback, DrawingView.DrawingThreadEventListener {
+        View.OnTouchListener, ActivityCompat.OnRequestPermissionsResultCallback, DrawingView.DrawingThreadEventListener,
+        KairosListener {
 
     public static final int MAX_SUPPORTED_FACES = 3;
     public static final boolean STORE_RAW_SCREENSHOTS = false; // setting to enable saving the raw images when taking screenshots
@@ -131,11 +141,13 @@ public class RecognizeActivity extends AppCompatActivity
     private boolean isFrontFacingCameraDetected = true;
     private boolean isBackFacingCameraDetected = true;
     private boolean multiFaceModeEnabled = false;
+    private Kairos kairos = new Kairos();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN); //To maximize UI space, we declare our app to be full-screen
+        initializeSdk();
         preproccessMetricImages();
         setContentView(R.layout.activity_recognize);
         initializeUI();
@@ -656,6 +668,7 @@ public class RecognizeActivity extends AppCompatActivity
         rightMetricsLayout.animate().alpha(1);
 
         resetFPSCalculations(); //Since the FPS may be different whether a face is being tracked or not, reset variables.
+        drawingView.requestBitmap();
     }
 
     @Override
@@ -1067,8 +1080,45 @@ public class RecognizeActivity extends AppCompatActivity
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                processScreenshot(bitmap, STORE_RAW_SCREENSHOTS);
+                getImage(bitmap);
+//                processScreenshot(bitmap, STORE_RAW_SCREENSHOTS);
             }
         });
+    }
+
+    private void getImage(Bitmap bitmap) {
+        String galleryId = getString(R.string.gallery_name);
+        try {
+            kairos.recognize(bitmap, galleryId, null, null, null, null, this);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onSuccess(String response) {
+        Log.d("KAIROS DEMO", response);
+        Gson gson = new Gson();
+        ResultBean resultBean = gson.fromJson(response, ResultBean.class);
+        if (resultBean.images.size() != 0) {
+            String userName = resultBean.images.get(0).transaction.subject_id;
+            Toast.makeText(this, userName + " recognised successfully", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), response, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onFail(String response) {
+        Log.d("KAIROS DEMO", response);
+        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_SHORT).show();
+    }
+
+    private void initializeSdk() {
+        String app_id = "c7d15241";
+        String api_key = "fd3287889f836397be1857dd4d0adb11";
+        kairos.setAuthentication(this, app_id, api_key);
     }
 }

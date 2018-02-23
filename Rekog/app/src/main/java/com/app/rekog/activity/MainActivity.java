@@ -10,21 +10,23 @@ import android.transition.ChangeBounds;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
 import com.app.rekog.R;
 import com.app.rekog.base.Utility;
 import com.app.rekog.beans.ResultBean;
 import com.app.rekog.customui.MaterialProgressDialog;
-import com.app.rekog.facetracker.FaceTrackerActivity;
 import com.app.rekog.recognize.RecognizeActivity;
 import com.google.gson.Gson;
 import com.kairos.Kairos;
 import com.kairos.KairosListener;
 import com.rahul.media.main.MediaFactory;
 import com.rahul.media.model.Define;
+
+import org.json.JSONException;
+
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import org.json.JSONException;
 
 public class MainActivity extends Activity implements KairosListener, View.OnClickListener {
 
@@ -128,7 +130,7 @@ public class MainActivity extends Activity implements KairosListener, View.OnCli
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.image_button:
-              startActivity(new Intent(this, FaceTrackerActivity.class));
+                startActivity(new Intent(this, EnrollmentActivity.class));
                 break;
             case R.id.recognise_button:
 //                isRecogniseImage = true;

@@ -9,4 +9,10 @@ public class BaseResponse {
     public int responseCode;
     public String responseMessage;
 
+    public UserData data;
+
+    public class UserData {
+        public String Email, FaceIDs;
+    }
+
 }

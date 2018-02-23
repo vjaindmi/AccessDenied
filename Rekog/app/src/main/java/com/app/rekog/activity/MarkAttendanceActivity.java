@@ -36,7 +36,10 @@ import com.app.rekog.base.Utility;
 import com.app.rekog.beans.BitmapBean;
 import com.app.rekog.beans.ResultBean;
 import com.app.rekog.beans.ResultBean.ImagesBean;
+import com.app.rekog.beans.users.TimeStamp;
+import com.app.rekog.beans.users.User;
 import com.app.rekog.customui.MaterialProgressDialog;
+import com.app.rekog.database.RealmDatabaseController;
 import com.app.rekog.facetracker.FaceGraphic;
 import com.app.rekog.facetracker.ui.camera.CameraSourcePreview;
 import com.app.rekog.facetracker.ui.camera.GraphicOverlay;
@@ -50,6 +53,7 @@ import com.google.android.gms.vision.face.FaceDetector;
 import com.google.gson.Gson;
 import com.kairos.Kairos;
 import com.kairos.KairosListener;
+import io.realm.RealmList;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -94,13 +98,31 @@ public final class MarkAttendanceActivity extends AppCompatActivity implements K
                 if (resultBean.images != null && !resultBean.images.isEmpty()) {
                     ImagesBean imagesBean = resultBean.images.get(0);
                     String subjectId = imagesBean.transaction.subject_id;
-
+                    User user = new User();
                     if (subjectId.contains(Utility.KAIROS_SEPARATOR)) {
                         String[] split = subjectId.split(Utility.KAIROS_SEPARATOR);
+                        user.setName(split[0]);
                         Toast.makeText(this, split[0] + " attendance marked", Toast.LENGTH_SHORT).show();
+                        if (split.length > 1) {
+                            user.setEmail(split[1]);
+                        }
                     } else {
                         Toast.makeText(this, subjectId + " attendance marked", Toast.LENGTH_SHORT).show();
                     }
+                    User user1 = RealmDatabaseController.getInstance().getUser(user.getEmail());
+                    RealmList<TimeStamp> al = new RealmList<>();
+                    if (user1 != null) {
+                        if (user1.getTime() != null) {
+//                            al.add(user1.getTime());
+                        }
+                    }
+                    else{
+
+                    }
+                    TimeStamp timeStamp = new TimeStamp();
+                    timeStamp.setTime(System.currentTimeMillis() + "");
+                    al.add(timeStamp);
+                    user.setTime(al);
 
                 }
             }

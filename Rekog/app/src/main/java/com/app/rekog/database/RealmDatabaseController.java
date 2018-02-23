@@ -12,11 +12,13 @@ import io.realm.RealmConfiguration;
 public class RealmDatabaseController implements GenericDatabaseInterface {
 
     private static RealmDatabaseController instance;
+
     private Realm realm;
 
     public static RealmDatabaseController getInstance() {
-        if(instance == null)
+        if (instance == null) {
             instance = new RealmDatabaseController();
+        }
         return instance;
     }
 
@@ -41,8 +43,8 @@ public class RealmDatabaseController implements GenericDatabaseInterface {
     }
 
     @Override
-    public User getUser(int id) {
-        return realm.where(User.class).equalTo("id", id).findFirst();
+    public User getUser(String email) {
+        return realm.where(User.class).equalTo("email", email).findFirst();
     }
 
 

@@ -41,17 +41,16 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.kairos.android.example.R;
-import com.kairos.android.example.Utils;
-import com.kairos.android.example.facetracker.ui.PhotoAdapter;
-import com.kairos.android.example.facetracker.ui.camera.CameraSourcePreview;
-import com.kairos.android.example.facetracker.ui.camera.GraphicOverlay;
+import com.app.Utils;
+import com.app.rekog.R;
+import com.app.rekog.facetracker.ui.PhotoAdapter;
+import com.app.rekog.facetracker.ui.camera.CameraSourcePreview;
+import com.app.rekog.facetracker.ui.camera.GraphicOverlay;
 
 /**
  * Activity for the face tracker app.  This app detects faces with the rear facing camera, and draws
@@ -72,10 +71,11 @@ public final class FaceTrackerActivity extends AppCompatActivity {
 
     private Button captureButton;
 
-    private boolean isFaceDetected;
     private RecyclerView mRecyclerView;
     private List<Bitmap> images = new ArrayList<>();
     private PhotoAdapter mPhotoAdapter;
+    private GraphicOverlay mOverlay;
+    private FaceGraphic mFaceGraphic;
 
     //==============================================================================================
     // Activity Methods
@@ -92,6 +92,15 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         mPreview = (CameraSourcePreview) findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
 
+        captureButton = findViewById(R.id.capture_button);
+        mRecyclerView = findViewById(R.id.photo_progress_recycler_view);
+        LinearLayoutManager layoutManager
+                = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        mRecyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mPhotoAdapter = new PhotoAdapter(images);
+        mRecyclerView.setAdapter(mPhotoAdapter);
+
         // Check for the camera permission before accessing the camera.  If the
         // permission is not granted yet, request permission.
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
@@ -101,21 +110,12 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             requestCameraPermission();
         }
 
-        captureButton = findViewById(R.id.capture_button);
-        mRecyclerView = findViewById(R.id.recyclerview);
-
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(
-                getApplicationContext());
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mPhotoAdapter = new PhotoAdapter(images);
-        mRecyclerView.setAdapter(mPhotoAdapter);
         captureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.CAMERA)
                         == PackageManager.PERMISSION_GRANTED) {
-                    if (isFaceDetected) {
+                    if (mOverlay.isGraphicOverlayDetected()) {
                         mCameraSource.takePicture(new CameraSource.ShutterCallback() {
                             @Override
                             public void onShutter() {
@@ -127,7 +127,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
 
                                 if (images.size() == 3) {
                                     AlertDialog.Builder builder = new AlertDialog.Builder(
-                                            getBaseContext());
+                                            FaceTrackerActivity.this);
                                     builder.setTitle("Prompt!");
                                     builder.setMessage(
                                             "Do you wish to add more or you want to exit.")
@@ -368,9 +368,6 @@ public final class FaceTrackerActivity extends AppCompatActivity {
      */
     private class GraphicFaceTracker extends Tracker<Face> {
 
-        private GraphicOverlay mOverlay;
-        private FaceGraphic mFaceGraphic;
-
         GraphicFaceTracker(GraphicOverlay overlay) {
             mOverlay = overlay;
             mFaceGraphic = new FaceGraphic(overlay);
@@ -382,9 +379,6 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         @Override
         public void onNewItem(int faceId, Face item) {
             mFaceGraphic.setId(faceId);
-            isFaceDetected = true;
-            Toast.makeText(getBaseContext(), "New Face has been detected", Toast.LENGTH_LONG)
-                    .show();
         }
 
         /**
@@ -404,7 +398,6 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         @Override
         public void onMissing(FaceDetector.Detections<Face> detectionResults) {
             mOverlay.remove(mFaceGraphic);
-            isFaceDetected = false;
         }
 
         /**

@@ -13,7 +13,7 @@ import android.widget.ImageView;
 
 import java.util.List;
 
-import com.kairos.android.example.R;
+import com.app.rekog.R;
 
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.MyViewHolder> {
 

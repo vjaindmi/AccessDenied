@@ -21,7 +21,7 @@ import android.graphics.Paint;
 
 import com.google.android.gms.vision.face.Face;
 
-import com.kairos.android.example.facetracker.ui.camera.GraphicOverlay;
+import com.app.rekog.facetracker.ui.camera.GraphicOverlay;
 
 /**
  * Graphic instance for rendering face position, orientation, and landmarks within an associated

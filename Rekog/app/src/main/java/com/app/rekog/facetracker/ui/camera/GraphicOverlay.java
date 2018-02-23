@@ -15,12 +15,12 @@
  */
 package com.app.rekog.facetracker.ui.camera;
 
+import com.google.android.gms.vision.CameraSource;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.view.View;
-
-import com.google.android.gms.vision.CameraSource;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -44,6 +44,7 @@ import java.util.Set;
  * </ol>
  */
 public class GraphicOverlay extends View {
+
     private final Object mLock = new Object();
     private int mPreviewWidth;
     private float mWidthScaleFactor = 1.0f;
@@ -58,6 +59,7 @@ public class GraphicOverlay extends View {
      * graphics element.  Add instances to the overlay using {@link GraphicOverlay#add(Graphic)}.
      */
     public static abstract class Graphic {
+
         private GraphicOverlay mOverlay;
 
         public Graphic(GraphicOverlay overlay) {
@@ -163,6 +165,10 @@ public class GraphicOverlay extends View {
             mFacing = facing;
         }
         postInvalidate();
+    }
+
+    public boolean isGraphicOverlayDetected() {
+        return mGraphics != null && mGraphics.size() == 1;
     }
 
     /**

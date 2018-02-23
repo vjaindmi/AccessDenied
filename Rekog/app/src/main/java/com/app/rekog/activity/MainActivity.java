@@ -12,6 +12,9 @@ import com.app.rekog.R;
 import com.app.rekog.base.Utility;
 import com.app.rekog.beans.ResultBean;
 import com.app.rekog.customui.MaterialProgressDialog;
+import com.google.gson.Gson;
+
+import com.app.rekog.facetracker.FaceTrackerActivity;
 import com.app.rekog.recognize.RecognizeActivity;
 import com.google.gson.Gson;
 import com.kairos.Kairos;
@@ -120,7 +123,7 @@ public class MainActivity extends Activity implements KairosListener, View.OnCli
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.image_button:
-//                startActivity(new Intent(this, EnrollmentActivity.class));
+              startActivity(new Intent(this, FaceTrackerActivity.class));
                 break;
             case R.id.recognise_button:
 //                isRecogniseImage = true;

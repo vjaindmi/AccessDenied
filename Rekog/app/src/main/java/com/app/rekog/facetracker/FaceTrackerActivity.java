@@ -15,6 +15,7 @@
  */
 package com.app.rekog.facetracker;
 
+import com.app.rekog.base.Utility;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.CameraSource;
@@ -46,7 +47,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.app.Utils;
 import com.app.rekog.R;
 import com.app.rekog.facetracker.ui.PhotoAdapter;
 import com.app.rekog.facetracker.ui.camera.CameraSourcePreview;
@@ -155,7 +155,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
 
                                 }
                                 images.add(
-                                        Utils.convertToBitmap(bytes));
+                                        Utility.convertToBitmap(bytes));
                                 mPhotoAdapter.notifyDataSetChanged();
                             }
                         });

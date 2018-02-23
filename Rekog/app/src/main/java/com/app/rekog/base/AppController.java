@@ -5,6 +5,7 @@ import com.app.rekog.R;
 import com.app.rekog.database.RealmDatabaseController;
 import com.kairos.Kairos;
 import com.rahul.media.model.Define;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 /**
  * Created by bkhera on 2/22/2018.
@@ -19,6 +20,11 @@ public class AppController extends Application {
         super.onCreate();
         initializeSdk();
         initDatabase();
+
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/Muller-Regular.otf").setFontAttrId(R.attr.fontPath)
+                .build());
+
     }
 
     /*initialized sdk*/

@@ -1,10 +1,12 @@
 package com.app.rekog.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.transition.ChangeBounds;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -12,8 +14,6 @@ import com.app.rekog.R;
 import com.app.rekog.base.Utility;
 import com.app.rekog.beans.ResultBean;
 import com.app.rekog.customui.MaterialProgressDialog;
-import com.google.gson.Gson;
-
 import com.app.rekog.facetracker.FaceTrackerActivity;
 import com.app.rekog.recognize.RecognizeActivity;
 import com.google.gson.Gson;
@@ -48,11 +48,16 @@ public class MainActivity extends Activity implements KairosListener, View.OnCli
     /**
      * Called when the activity is first created.
      */
+    @SuppressLint("NewApi")
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ChangeBounds changeBounds = new ChangeBounds();
+        changeBounds.setDuration(1000);
+        getWindow().setSharedElementEnterTransition(changeBounds);
+
         initializeSdk();
         Define.MEDIA_PROVIDER = getString(R.string.image_provider);
         findViewById(R.id.image_button).setOnClickListener(this);

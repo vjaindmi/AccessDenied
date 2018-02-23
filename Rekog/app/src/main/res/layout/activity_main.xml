@@ -48,7 +48,7 @@
             android:gravity="center"
             android:letterSpacing="0.5"
             android:text="Delete"
-            android:visibility="visible" />
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/image_button"

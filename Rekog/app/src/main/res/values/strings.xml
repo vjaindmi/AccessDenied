@@ -58,4 +58,6 @@
     <string name="upload_images">Upload Images</string>
     <string name="already_enrolled">You are already enrolled</string>
     <string name="please_look_directly_into_the_camera">Please look directly into the camera</string>
+    <string name="time">Time</string>
+    <string name="attendance_record">Attendance Record</string>
 </resources>

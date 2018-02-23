@@ -297,4 +297,16 @@ public class Utility {
         }
     }
 
+    public static String getDate(long timeStamp){
+
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyy HH:mm");
+            Date netDate = (new Date(timeStamp));
+            return sdf.format(netDate);
+        }
+        catch(Exception ex){
+            return "xx";
+        }
+    }
+
 }

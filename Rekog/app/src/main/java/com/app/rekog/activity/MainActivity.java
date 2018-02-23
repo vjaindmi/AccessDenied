@@ -16,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+
 import com.app.rekog.R;
 import com.app.rekog.beans.ResultBean;
 import com.app.rekog.customui.MaterialProgressDialog;
@@ -25,10 +26,13 @@ import com.kairos.Kairos;
 import com.kairos.KairosListener;
 import com.rahul.media.main.MediaFactory;
 import com.rahul.media.model.Define;
+
+import org.json.JSONException;
+
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import org.json.JSONException;
+
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class MainActivity extends Activity implements KairosListener, View.OnClickListener {
@@ -67,6 +71,7 @@ public class MainActivity extends Activity implements KairosListener, View.OnCli
         findViewById(R.id.image_button).setOnClickListener(this);
         findViewById(R.id.recognise_button).setOnClickListener(this);
         findViewById(R.id.mark_attendance_button).setOnClickListener(this);
+        findViewById(R.id.view_attendance_button).setOnClickListener(this);
         findViewById(R.id.delete).setOnClickListener(this);
 
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -96,7 +101,7 @@ public class MainActivity extends Activity implements KairosListener, View.OnCli
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            int[] grantResults) {
+                                           int[] grantResults) {
         if (requestCode != RC_HANDLE_CAMERA_PERM) {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
             return;
@@ -194,6 +199,9 @@ public class MainActivity extends Activity implements KairosListener, View.OnCli
                 break;
             case R.id.mark_attendance_button:
                 startActivity(new Intent(MainActivity.this, MarkAttendanceActivity.class));
+                break;
+            case R.id.view_attendance_button:
+                startActivity(new Intent(this, AttendanceRecordActivity.class));
                 break;
         }
     }
